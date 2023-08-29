@@ -31,9 +31,7 @@ type Port struct {
 
 // ScanPorts performs port scanning on a subdomain to determine which ports are open
 // and returns a subdomain
-func ScanPorts(url string) Subdomain {
-	noOfPorts := len(PORTS_LIST)
-	host := url
+func ScanPorts(host string) Subdomain {
 	addrs, err := net.LookupHost(host)
 	if err != nil {
 		log.Fatal("Unable to lookup host ->", host)
@@ -43,15 +41,15 @@ func ScanPorts(url string) Subdomain {
 	var result Subdomain
 	result.Domain = host
 
-	wg.Add(noOfPorts)
-	for pt := range PORTS_LIST {
+	wg.Add(len(PORTS_LIST))
+	for _, pt := range PORTS_LIST {
 		go func(pt uint16) {
 			defer wg.Done()
 			port := scanPort(addrs[0], pt)
 			if port.ConnOpen {
 				result.OpenPorts = append(result.OpenPorts, port)
 			}
-		}(uint16(pt))
+		}(pt)
 	}
 
 	wg.Wait()

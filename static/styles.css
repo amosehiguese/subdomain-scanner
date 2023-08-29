@@ -99,7 +99,7 @@ a {
     margin-top: 20px;
     border-radius: 12px;
     padding: 12px;
-    border: 2px solid rgb(251,248,190);
+    border: 2px solid white;
     flex: 1;
     width: 70%;
 }
@@ -111,11 +111,11 @@ a {
 }
 
 #export-results {
-    border: 1px solid rgb(251,248,190);
+    border: 1px solid black;
     border-radius: 6px;
     font-size: 1.0rem;
     cursor: pointer;
-    background-color: rgb(251,248,190);
+    background-color: hsl(205, 90%, 76%);
     padding: 4px 8px;
 }
 .export-text {
@@ -128,7 +128,7 @@ a {
 }
 
 .result {
-    border-bottom: 1px solid rgb(251,248,190);
+    border-bottom: 1px solid white;
     padding-bottom: 20px;
     display: flex;
     flex-direction: column;
@@ -144,12 +144,12 @@ a {
 
 .subdomain {
     font-size: 1.1rem;
-    color: black;
+    color: white;
     flex: 4;
 }
 
 .show-ports-btn {
-    background-color: rgb(251,248,190);
+    background-color: hsl(205, 90%, 76%);
     color: black;
     border: none;
     cursor: pointer;
@@ -183,7 +183,7 @@ a {
 }
 
 .port-number {
-    color: black;
+    color: white;
 
 }
 

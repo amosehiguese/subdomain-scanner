@@ -88,7 +88,7 @@ function renderResults(query, results) {
     });
 
     for(const result of results) {
-        console.log("scanning ", result["domain_name"]);
+        console.log("scanning ", result["domain"]);
         let newResult = document.createElement('div');
         newResult.classList.add("result");
         resultsContainer.appendChild(newResult);
@@ -100,7 +100,7 @@ function renderResults(query, results) {
         let subdomain = document.createElement('div');
         subdomain.classList.add("subdomain");
         subdomainRow.appendChild(subdomain);
-        subdomain.innerText = `${result["domain_name"]}`;
+        subdomain.innerText = `${result["domain"]}`;
 
         let showButton = document.createElement('button');
         showButton.classList.add("show-ports-btn");

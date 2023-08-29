@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"net/url"
 
 	"github.com/amosehiguese/subdscanner/scanners"
 	"github.com/gorilla/mux"
@@ -11,11 +12,18 @@ import (
 
 func GetDomain(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	url := params["domain"]
-
-	subdomains, err := scanners.Scan(url)
+	domain := params["domain"]
+	_, err := url.Parse(domain)
 	if err != nil {
-		log.Fatalln("An Error occurred during scanning")
+		log.Println("Unable to parse ->", domain)
+		errResp := NewError(http.StatusBadRequest, "bad request")
+		json.NewEncoder(w).Encode(errResp)
+		return
+	}
+
+	subdomains, err := scanners.Scan(domain)
+	if err != nil {
+		log.Println("An Error occurred during scanning")
 		errResp := NewError(http.StatusInternalServerError, "An error occurred. We are on it!")
 		json.NewEncoder(w).Encode(errResp)
 	}
