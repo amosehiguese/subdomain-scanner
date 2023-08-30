@@ -1,3 +1,6 @@
 .PHONY: build
 build:
-	go build -o /bin/
+	go build -o bin/subd
+.PHONY: run
+run: build
+	./bin/subd
