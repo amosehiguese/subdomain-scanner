@@ -10,4 +10,4 @@ This tool provides a way to gather valuable information that can be used for sec
 
 Feel free to indulge in using this powerful tool to enhance your subdomain discovery experience.
 
-Happy Hacking!
+Happy Hacking! 

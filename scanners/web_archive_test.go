@@ -9,7 +9,7 @@ import (
 func TestWebArchiveSubdomainScanner(t *testing.T) {
 	wa := NewWebArchive()
 
-	target := "vwrm.com" // Replace with the target domain you want to test
+	target := "vwrm.com"
 
 	subdomains, err := wa.GetSubdomains(target)
 	require.NoError(t, err)
