@@ -1,4 +1,5 @@
 TAG ?= 1.0.0
+IMAGENAME ?= amosehiguese/subd
 
 .PHONY: build
 build:
@@ -8,4 +9,4 @@ run: build
 	./bin/subd
 .PHONY: docker-build
 docker-build:
-	docker build -t amosehiguese/subd:$(TAG) .
+	docker build -t $(IMAGENAME):$(TAG) .
