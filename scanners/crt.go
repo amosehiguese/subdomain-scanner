@@ -14,7 +14,7 @@ type crtSh struct {
 
 func NewCrt() *crtSh {
 	return &crtSh{
-		Name: "Web.archive.org subdomains scan",
+		Name: "crtsh subdomains scan",
 	}
 }
 
