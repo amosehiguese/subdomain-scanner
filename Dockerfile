@@ -5,4 +5,4 @@ RUN CGO_ENABLED=0 go build -o /go/bin/subd ./bin/subd
 
 FROM scratch
 COPY --from=build /go/bin/subd /bin/subd
-ENTRYPOINT ["/bin/subd"]
+ENTRYPOINT ["./bin/subd"]
