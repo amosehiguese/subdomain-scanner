@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ .Values.container.name }}-{{ .Values.environment }}"
+  namespace: {{ .Values.namespace }}
+  labels: 
+    app: {{ .Values.container.name }}
+    env: {{ .Values.environment }}
+spec:
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.container.name }}
+      env: {{ .Values.environment }}
+  template:
+    metadata:
+      labels: 
+          app: {{ .Values.container.name }}
+          env: {{ .Values.environment }}
+    spec:
+      terminationGracePeriodSeconds: 5
+      securityContext:
+        fsGroup: 1000
+        runAsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 1000
+      containers:
+        - name: {{ .Values.container.name }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+              add:
+                - NET_BIND_SERVICE
+            privileged: false
+            readOnlyRootFilesystem: true
+          image: "{{ .Values.container.image.repository }}:{{ .Values.container.image.tag }}"
+          ports:
+            - containerPort: {{ .Values.container.port}}
+          resources:
+            requests:
+              cpu: {{ .Values.request.cpu }}
+              memory: {{ .Values.request.memory }}
+            limits:
+              cpu: {{ .Values.limit.cpu }}
+              memory: {{ .Values.limit.memory }}
+          readinessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.container.port }}
+            initialDelaySeconds: 20
+            periodSeconds: 15
+          livenessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.container.port}}
+            initialDelaySeconds: 20
+            periodSeconds: 15
+
+

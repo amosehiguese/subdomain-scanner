@@ -1,12 +1,14 @@
 package scanners
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"net/url"
 	"sync"
+	"time"
 )
 
 type webArchive struct {
@@ -16,7 +18,7 @@ type webArchive struct {
 
 func NewWebArchive() *webArchive {
 	return &webArchive{
-		Name: "Web.archive.org subdomains scan",
+		Name: "Web.archive.org scan",
 	}
 }
 
@@ -28,7 +30,17 @@ func (wa *webArchive) GetSubdomains(target string) ([]string, error) {
 	log.Printf("%v scanning", wa.GetName())
 
 	urlT := fmt.Sprintf("https://web.archive.org/cdx/search/cdx?matchType=domain&fl=original&output=json&collapse=urlkey&url=%s", target)
-	resp, err := http.Get(urlT)
+	client := &http.Client{}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10 * time.Second)
+	defer cancel()
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, urlT, nil)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	resp, err := client.Do(req)
 	if err != nil {
 		log.Println(err)
 		return nil, err

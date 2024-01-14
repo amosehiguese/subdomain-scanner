@@ -28,7 +28,11 @@ func GetDomain(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(errResp)
 	}
 
-	response := Subdomains{Subdomains: subdomains}
+	var response Subdomains
+	for s := range subdomains{
+		response.Subdomains = append(response.Subdomains, s)
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
 }

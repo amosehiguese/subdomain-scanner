@@ -16,5 +16,5 @@ func main() {
 	r.HandleFunc("/api/v1/scan/{domain}", api.GetDomain).Methods("GET")
 
 	log.Println("server running...")
-	http.ListenAndServe("127.0.0.1:8080", r)
+	http.ListenAndServe(":8080", r)
 }

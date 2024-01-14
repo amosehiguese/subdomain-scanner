@@ -9,9 +9,9 @@ import (
 )
 
 // Scan scans subdomains concurrently using various scanners.
-func Scan(url string) (*[]subdomain.Subdomain, error) {
-	var mu sync.Mutex
-	var result []subdomain.Subdomain
+func Scan(url string) (chan subdomain.Subdomain, error) {
+	// var mu sync.Mutex
+	result := make(chan subdomain.Subdomain, 50)
 
 	var wg sync.WaitGroup
 	startTime := time.Now()
@@ -50,21 +50,22 @@ func Scan(url string) (*[]subdomain.Subdomain, error) {
 			// Start port scanning
 			for _, subdom := range resolvedSubdomains {
 				sd := subdomain.ScanPorts(subdom)
-				mu.Lock()
-				result = append(result, sd)
-				mu.Unlock()
+				// mu.Lock()
+				result <- sd
+				// mu.Unlock()
 			}
-			log.Println("step done")
+			log.Printf("step done for %v", sc.GetName())
 		}(scanner)
 	}
 
 	wg.Wait()
+	close(result)
 	endTime := time.Now()
 	totalScanTime := endTime.Sub(startTime)
 
 	log.Println("Scan completed in ->", totalScanTime)
 
-	return &result, nil
+	return result, nil
 }
 
 func resolveDNS(domain string) bool {

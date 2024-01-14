@@ -3,7 +3,7 @@ package api
 import "github.com/amosehiguese/subdscanner/subdomain"
 
 type Subdomains struct {
-	Subdomains *[]subdomain.Subdomain
+	Subdomains []subdomain.Subdomain
 }
 
 type errorResp struct {
