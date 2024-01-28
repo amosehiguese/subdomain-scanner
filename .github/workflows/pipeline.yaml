@@ -1,0 +1,46 @@
+name: Subd Container Deployment Pipeline
+
+on: 
+  push:
+    branches: ["main"]
+    tags: ['v*.*.*']
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  integration:
+    uses: ./.github/workflows/integration-workflow.yaml
+    permissions: 
+      contents: read
+
+  delivery:
+    needs: [integration]
+    uses: ./.github/workflows/delivery-workflow.yaml
+    permissions: 
+      contents: read
+      packages: write
+      id-token: write
+  
+  deploy-staging:
+    needs: [delivery]
+    uses: ./.github/workflows/deploy-aws-app-runner.yaml
+    with:
+      environment: Staging
+    permissions:
+      packages: read
+    secrets: inherit
+
+  deploy-production:
+    needs: [delivery]
+    uses: ./.github/workflows/deploy-aws-app-runner.yaml
+    with:
+      environment: Production
+    permissions:
+      packages: read
+    secrets: inherit
+  

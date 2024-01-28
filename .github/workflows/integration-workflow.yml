@@ -1,14 +1,11 @@
-name: Go
-
-env:
-  GIN_MODE: release
+name: Subd Integration Workflow
 
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+  workflow_call:
   workflow_dispatch:
+
+  permissions:
+    contents: read
 
 jobs:
   build:
