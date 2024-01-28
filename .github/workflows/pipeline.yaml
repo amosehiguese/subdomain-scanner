@@ -17,6 +17,7 @@ jobs:
     uses: ./.github/workflows/integration-workflow.yaml
     permissions: 
       contents: read
+      checks: write
 
   delivery:
     needs: [integration]
