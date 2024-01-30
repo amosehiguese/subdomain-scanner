@@ -37,7 +37,7 @@ jobs:
     secrets: inherit
 
   deploy-production:
-    needs: [delivery]
+    needs: [deploy-staging]
     uses: ./.github/workflows/deploy-aws-app-runner.yaml
     with:
       environment: Production
