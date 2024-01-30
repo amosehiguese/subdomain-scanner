@@ -3,9 +3,9 @@ namespace: subdprod
 container:
   name: subd
   port: 8080
-  image: 
-    repository: amosehiguese/subd
-    tag: 1.0.1
+  image:
+    repository: ghcr.io/amosehiguese/subdomain-scanner
+    tag: sha256:648c01e138c566124d6cc47ea1591a9b657d050072d385029eb3c4640f97bec8
 request:
   cpu: 200m
   memory: 180Mi
