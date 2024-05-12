@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package subdomain.api.portscan.v1;
+
+service PortScanService {
+    rpc ScanForOpenPorts(PortScanRequest) returns (stream Port) {};
+}
+
+message PortScanRequest {
+    string host = 1;
+    uint16  port = 2;
+}
+
+message Port {
+    bool connOpen = 1;
+    uint16 port = 2;
+}

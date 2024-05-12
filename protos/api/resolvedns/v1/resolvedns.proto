@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+options java_package = "subdomain.api.resolvedns.v1";
+
+package resolvedns;
+
+service ResolveDnsService {
+    rpc ResolveDns(ResolveDnsRequest) returns (stream ResolveDnsResponse) {};
+}
+
+message ResolveDnsRequest {
+    repeated string hosts = 1;
+}
+
+message ResolveDnsResponse {
+    string subdomain = 1;
+}
