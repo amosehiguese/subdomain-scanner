@@ -22,7 +22,7 @@ impl PortScanService for PortScanComponent {
         log::info!("Scanning for open ports...");
 
         let buffer = 100000;
-        let mut  stream = request.into_inner();
+        let mut stream = request.into_inner();
         let output = async_stream::try_stream!{
             while let Some(req) = stream.next().await {
                 let req = req.unwrap();

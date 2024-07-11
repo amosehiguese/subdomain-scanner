@@ -1,0 +1,157 @@
+package com.dnsresolvesvc;
+
+import io.grpc.BindableService;
+import io.grpc.Server;
+import io.grpc.ServerBuilder;
+import io.grpc.ServerInterceptors;
+import io.grpc.ServerServiceDefinition;
+import io.grpc.StatusRuntimeException;
+import io.grpc.health.v1.HealthCheckResponse.ServingStatus;
+import io.grpc.protobuf.services.HealthStatusManager;
+import io.grpc.stub.StreamObserver;
+
+import io.opentelemetry.api.OpenTelemetry;
+import io.opentelemetry.instrumentation.grpc.v1_6.GrpcTelemetry;
+
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
+
+import com.dnsresolve.Resolvedns.ResolveDnsRequest;
+import com.dnsresolve.Resolvedns.ResolveDnsResponse;
+import com.dnsresolve.ResolveDnsServiceGrpc.ResolveDnsServiceImplBase;
+
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+
+public class DnsResolveService {
+    private static final Logger logger = LogManager.getLogger(DnsResolveService.class);
+
+    private Server server;
+    private HealthStatusManager healthMgr;
+
+    private static OpenTelemetry otel;
+
+    private static final DnsResolveService service = new DnsResolveService();
+
+    private void start() throws IOException {
+        int port = Integer.parseInt(System.getenv().getOrDefault("PORT", "6856"));
+        healthMgr = new HealthStatusManager();
+
+        server = 
+            ServerBuilder.forPort(port)
+            // .addService(configureServerInterceptor(otel, getResolveServiceImpl()))
+            .addService(new DnsResolveServiceImpl())
+            .addService(healthMgr.getHealthService())
+            .build()
+            .start();
+        
+        logger.info("DnsResolve Service started, listening on " + port);
+        System.out.println("starting");
+        Runtime.getRuntime()
+            .addShutdownHook(
+                new Thread(
+                    () -> {
+                        System.err.println(
+                            "shutting down gRPC DnsResolve server"
+                            );
+                        DnsResolveService.this.stop();
+                        System.err.println("server shut down");
+                    }
+                )
+            );
+        healthMgr.setStatus("", ServingStatus.SERVING);
+    }
+
+    // Ensures that all gRPC server requests are automatically traced
+    ServerServiceDefinition configureServerInterceptor(
+        OpenTelemetry otel, 
+        BindableService bindableService
+    ) {
+        GrpcTelemetry grpcTelemetry = GrpcTelemetry.create(otel);
+        return ServerInterceptors.intercept(bindableService, grpcTelemetry.newServerInterceptor());
+    }
+
+    private void stop() {
+        if (server != null){
+            healthMgr.clearStatus("");
+            server.shutdown();
+        }
+    }
+
+    public static DnsResolveServiceImpl getResolveServiceImpl(){
+        return new DnsResolveServiceImpl();
+    }
+    
+    private static class DnsResolveServiceImpl extends ResolveDnsServiceImplBase {
+        @Override
+        public void resolveDns(ResolveDnsRequest request, StreamObserver<ResolveDnsResponse> responseObserver) {
+            logger.info("received " + request.getHostsCount() + "new dns to resolve");
+            try {
+                for (String host: request.getHostsList()){
+                    if (resolves(host)) {
+                        ResolveDnsResponse resp = ResolveDnsResponse.newBuilder().setSubdomain(host).build();
+                        responseObserver.onNext(resp);
+                    }
+                }
+                responseObserver.onCompleted();
+            } catch (StatusRuntimeException e) {
+                logger.log(Level.WARN, "Failed with status {}", e.getStatus());
+                responseObserver.onError(e);
+            }
+        }
+
+        public static boolean resolves(String host) {
+            try {
+                InetAddress address = InetAddress.getByName(host);
+                logger.info(host + " resolved successfully with address " + address);
+                return true;
+
+            } catch (UnknownHostException e) {
+                logger.info("unable to resolve " + host);
+                return false;
+            }
+        }
+    }
+
+    private static DnsResolveService getInstance() {
+        return service;
+    }
+
+    private void blockUntilShutdown() throws InterruptedException {
+        if (server != null) {
+            server.awaitTermination();
+        }
+    }
+
+    private static void initTracing() {
+        if (System.getenv("DISABLE_TRACING") != null) {
+            logger.info("Tracing disabled.");
+            return;
+        }
+        logger.info("Tracing enabled");    
+        if (System.getenv("OTEL_ENDPOINT") != null) {
+            String endpoint = System.getenv("OTEL_ENDPOINT");
+            otel = Telemetry.initOpenTelemetry(endpoint);
+        }
+    }
+
+    public static void main(String[] args) throws IOException, InterruptedException {
+        new Thread(
+            () -> {
+                initTracing();
+            }
+        )
+        .start();
+        
+        // Start the RPC Server
+        logger.info("DnsResolve Service starting...");
+        System.out.println("starting again");
+        final DnsResolveService service = DnsResolveService.getInstance();
+        service.start();
+        service.blockUntilShutdown();
+    }
+}
