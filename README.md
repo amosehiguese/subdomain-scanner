@@ -87,7 +87,7 @@ The user initiates a POST request containing the target domain. Upon receiving t
 
 Copyright 2024 Subdomain Enumeration Tool
 
-Licensed under the Apache License. <br/> See [LICENSE.md](LICENSE.md) for more information.
+Licensed under the Apache License. <br/> See [LICENSE.md](LICENSE) for more information.
 
 ## Contributors ✨
 
