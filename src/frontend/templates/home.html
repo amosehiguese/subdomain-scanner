@@ -1,0 +1,28 @@
+{{ define "home" }}
+
+{{ template "header" .}}
+<div id="intro-content">
+    <h2 id="welcome-text">Subdomain scanner by Amos Ehiguese</h2>
+    <div id="input-container">
+    <input id="query-input" placeholder="example.com">
+    <button id="scan-button">Scan</button>
+    </div>
+</div>
+
+<div id="main-content">
+    <div id="results-section">
+    </div>
+    <span id="text-span">
+        <div id="crusty-message">
+            <p>Subdomain Scanner</p>
+            <p>Enter a domain to start.</p>
+            <p>Happy hacking!</p>
+        </div>
+    </span>
+</div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
+
+{{ end }}

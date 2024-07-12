@@ -1,0 +1,67 @@
+syntax = "proto3";
+
+option go_package = "./subdomain_v1";
+
+package subdomain.v1;
+
+// -----------------ApiQuery service-----------------
+
+service ApiQueryService {
+    rpc GetSubdomainsByApiQuery(ApiQueryRequest) returns (ApiQueryResponse) {}
+}
+
+message ApiQueryRequest {
+    string target = 1;
+}
+
+message ApiQueryResponse {
+    repeated string subdomains = 1;
+}
+
+// -----------------Brute Force service-----------------
+
+service BruteService {
+    rpc GetSubdomainsByBruteForce(BruteForceRequest) returns (BruteForceResponse) {}
+}
+
+message BruteForceRequest {
+    string target = 1;
+}
+
+message BruteForceResponse {
+    repeated string subdomains = 1;
+}
+
+// -----------------Resolve DNS service-----------------
+
+service ResolveDnsService {
+    rpc ResolveDns(ResolveDnsRequest) returns (stream ResolveDnsResponse) {};
+}
+
+message ResolveDnsRequest {
+    repeated string hosts = 1;
+}
+
+message ResolveDnsResponse {
+    string subdomain = 1;
+}
+
+// -----------------Port Scan service-----------------
+
+service PortScanService {
+    rpc ScanForOpenPorts(stream PortScanRequest) returns (stream Subdomain) {};
+}
+
+message PortScanRequest {
+    string host = 1;
+}
+
+message Subdomain {
+    string domain = 1;
+    repeated Port ports = 2;
+}
+
+message Port {
+    bool connOpen = 1;
+    uint32 port = 2;
+}

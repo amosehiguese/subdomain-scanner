@@ -75,3 +75,4 @@ If you've deployed the application with `skaffold run` command, you can run
 Feel free to indulge in using this powerful tool to enhance your subdomain discovery experience.
 
 Happy Hacking!
+
