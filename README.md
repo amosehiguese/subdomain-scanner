@@ -1,78 +1,105 @@
-## Subdomain Enumeration Scanner
+<br/>
 
-![application image](./docs/subdomain-scanner.png)
+<div align="center">
+  Like this project ? Leave us a star ⭐
+</div>
 
-Subdomain Enumeration Scanner is a tool designed to help you discover all the subdomains associated with a specific domain.
+<br/>
+
+<div align="center">
+  <a href="#" target="_blank">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/subdomain.png">
+    <img alt="Subd Logo" src="assets/subdomain.png" width="280"/>
+  </picture>
+  </a>
+</div>
+
+
+<h3 align="center">
+  Subdomain Enumeration Tool 🔥.
+</h3>
+
+<br/>
+
+<p align="center">
+  <a href="CODE_OF_CONDUCT.md">
+    <img src="https://img.shields.io/badge/Contributor%20Covenant-2.0-4baaaa.svg" alt="Code of conduct">
+  </a>
+  <a href="LICENSE">
+    <img src="https://img.shields.io/badge/license-Apache%20-blue" alt="MIT">
+  </a>
+  <img src="https://img.shields.io/badge/status-experimental-red" alt="Experimental">
+</p>
+
+
+<div>
+<span>
+
+Subdomain Enumeration Scanner is a cloud-first microservices tool designed to help you discover all the subdomains associated with a specific domain.
 
 This tool provides a way to gather valuable information that can be used for security testing, or just gaining insights into a target domain's online presence.
+</span>
+</div>
 
-### Architecture
+---
 
-![project-architecture](./docs/arch.png)
 
-# Development Guide
 
-This doc explains how to build and run the Subdomain Scanner source code locally using the `skaffold` command-line tool.
 
-## Prerequisites
+<p align="center">
+  <img src="assets/subdomain-scanner.png" alt="Application Banner" width="640" >
+</p>
 
-- [Docker for Desktop](https://www.docker.com/products/docker-desktop)
-- [Minikube](https://minikube.sigs.k8s.io/docs/start/) (optional Local Cluster 1)
-- [Kind](https://kind.sigs.k8s.io/) (optional Local Cluster 2)
-- [kubectl](https://kubernetes.io/docs/tasks/tools/)
-- [skaffold **2.0.2+**](https://skaffold.dev/docs/install/) (latest version recommended), a tool that builds and deploys Docker images in bulk.
-- Clone the repository.
-  ```sh
-  git clone https://github.com/amosehiguese/subdomain-scanner.git
-  cd subdomain-scanner/
-  ```
+<br/>
 
-## Run on a Local Cluster
 
-1. Launch a local Kubernetes cluster with one of the following tools:
+## How It Works
 
-   - To launch **Minikube** (tested with Ubuntu Linux). Please, ensure that the
-     local Kubernetes cluster has at least:
+The user initiates a POST request containing the target domain. Upon receiving the request, the handler parses and deserializes the payload into a local data structure. This data structure is then passed to a `scan` method responsible for identifying subdomains related to the given domain.
 
-     - 4 CPUs
-     - 4.0 GiB memory
-     - 32 GB disk space
+### Steps in the `scan` Method:
 
-     ```shell
-     minikube start --cpus=4 --memory 4096 --disk-size 32g
-     ```
+1. **Subdomain Discovery:**
+   - The arguments are passed to `apiQuerySvc` and `bruteSvc`, which both return lists of subdomains. These lists are combined into a single result.
 
-   - To launch **Docker for Desktop** (tested with Mac/Windows). Go to Preferences:
+2. **DNS Resolution:**
+   - The combined subdomain list is passed to `resolveDnsSvc`, which resolves the subdomains into their corresponding DNS addresses.
 
-     - choose “Enable Kubernetes”,
-     - set CPUs to at least 3, and Memory to at least 6.0 GiB
-     - on the "Disk" tab, set at least 32 GB disk space
+3. **Port Scanning:**
+   - The resolved DNS addresses are sent to `portScanSvc` for scanning open ports. This service returns a refined list of subdomains, each annotated with its open ports.
 
-   - To launch a **Kind** cluster:
+4. **Response Construction:**
+   - The final list, including subdomains and their open ports, is sent back as a response to the client.
 
-     ```shell
-     kind create cluster
-     ```
+| Service                                              | Language      | Description                                                                                                                       |
+| ---------------------------------------------------- | ------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| [frontend](/src/frontend)                           | Go            | Exposes an HTTP server to serve the website.|
+| [apiqueryservice](/src/apiquerysvc)                     | Typescript            | Queries external api to get associated subdomains                                                           |
+| [bruteforceservice](/src/brutesvc) | Rust           | Uses the brute force methodology of finding subdomains                       |
+| [dnsresolveservice](/src/dnsresolvesvc)             | Java       | Responsible for resolving domain names to its ip addresses |
+| [portscanservice](/src/portscansvc)               | Rust       | Responsible for scanning subdomains for open ports                                    |
+| [aisupportservice](/src/aisupportsvc)             | Python           | Get support by interacting with a LLM                                |
 
-2. Run `kubectl get nodes` to verify you're connected to the respective control plane.
 
-3. Run `skaffold run` (first time will be slow, it can take ~20 minutes).
-   This will build and deploy the application. If you need to rebuild the images
-   automatically as you refactor the code, run `skaffold dev` command.
 
-4. Run `kubectl get pods` to verify the Pods are ready and running.
+## License
 
-5. Run `kubectl port-forward pod/<Pod_name> 8080:8080` to forward a port to the frontend.
+Copyright 2024 Subdomain Enumeration Tool
 
-6. Navigate to `localhost:8080` to access the web frontend.
+Licensed under the Apache License. <br/> See [LICENSE.md](LICENSE.md) for more information.
 
-## Cleanup
+## Contributors ✨
 
-If you've deployed the application with `skaffold run` command, you can run
+<a href="https://github.com/remarkablemark">
+  <img src="https://avatars.githubusercontent.com/u/93928881?s=50&u=b468eec8d146b8a918bcae959e3ee7b74ba336c2&v=4&mask=circle">
+</a>
 
-`skaffold delete` to clean up the deployed resources.
 
-Feel free to indulge in using this powerful tool to enhance your subdomain discovery experience.
+
+## Star History
+
+Truly grateful for your support 💖
 
 Happy Hacking!
 
