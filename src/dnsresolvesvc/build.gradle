@@ -17,11 +17,19 @@ java {
     }
 }
 
-def grpcVersion = '1.63.0' 
+def grpcVersion = '1.63.0'
 def protobufVersion = '3.25.1'
 def protocVersion = protobufVersion
 
+ext {
+  speed = project.hasProperty('speed') ? project.getProperty('speed') : false
+  offlineCompile = new File("$buildDir/output/lib")
+}
+
 dependencies {
+  if (speed) {
+    implementation fileTree(dir: offlineCompile, include: '*.jar')
+  } else {
     implementation "io.grpc:grpc-protobuf:${grpcVersion}"
     implementation "io.grpc:grpc-services:${grpcVersion}"
     implementation "io.grpc:grpc-stub:${grpcVersion}"
@@ -32,7 +40,7 @@ dependencies {
     implementation "io.opentelemetry:opentelemetry-sdk:1.38.0"
     implementation "io.opentelemetry:opentelemetry-exporter-otlp:1.38.0"
     implementation "io.opentelemetry.instrumentation:opentelemetry-grpc-1.6"
-    
+
     // Alpha module
     implementation "io.opentelemetry.semconv:opentelemetry-semconv:1.21.0-alpha"
     implementation "io.opentelemetry.instrumentation:opentelemetry-grpc-1.6:1.32.0-alpha"
@@ -45,6 +53,7 @@ dependencies {
     testImplementation "io.grpc:grpc-inprocess:${grpcVersion}"
     testImplementation "junit:junit:4.13.2"
     testImplementation "org.mockito:mockito-core:4.4.0"
+  }
 }
 
 protobuf {
@@ -68,6 +77,14 @@ sourceSets {
 }
 
 startScripts.enabled = false
+
+// This is to cache dependencies during Docker image build
+task downloadRepos(type: Copy){
+  from configurations.compileClasspath
+  into offlineCompile
+  from configurations.compileClasspath
+  into offlineCompile
+}
 
 // Creates start scripts for a class name and adds it to the distribution. The
 // base class name is used to name the task and scripts. For example, passed

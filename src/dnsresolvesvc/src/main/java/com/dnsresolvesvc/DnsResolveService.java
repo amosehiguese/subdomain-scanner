@@ -41,14 +41,14 @@ public class DnsResolveService {
         int port = Integer.parseInt(System.getenv().getOrDefault("PORT", "6856"));
         healthMgr = new HealthStatusManager();
 
-        server = 
+        server =
             ServerBuilder.forPort(port)
             // .addService(configureServerInterceptor(otel, getResolveServiceImpl()))
             .addService(new DnsResolveServiceImpl())
             .addService(healthMgr.getHealthService())
             .build()
             .start();
-        
+
         logger.info("DnsResolve Service started, listening on " + port);
         System.out.println("starting");
         Runtime.getRuntime()
@@ -68,7 +68,7 @@ public class DnsResolveService {
 
     // Ensures that all gRPC server requests are automatically traced
     ServerServiceDefinition configureServerInterceptor(
-        OpenTelemetry otel, 
+        OpenTelemetry otel,
         BindableService bindableService
     ) {
         GrpcTelemetry grpcTelemetry = GrpcTelemetry.create(otel);
@@ -85,7 +85,7 @@ public class DnsResolveService {
     public static DnsResolveServiceImpl getResolveServiceImpl(){
         return new DnsResolveServiceImpl();
     }
-    
+
     private static class DnsResolveServiceImpl extends ResolveDnsServiceImplBase {
         @Override
         public void resolveDns(ResolveDnsRequest request, StreamObserver<ResolveDnsResponse> responseObserver) {
@@ -128,15 +128,14 @@ public class DnsResolveService {
     }
 
     private static void initTracing() {
-        if (System.getenv("DISABLE_TRACING") != null) {
-            logger.info("Tracing disabled.");
-            return;
-        }
-        logger.info("Tracing enabled");    
-        if (System.getenv("OTEL_ENDPOINT") != null) {
+        String tracing_enabled = System.getenv("tracing_enabled");
+        if (tracing_enabled != null && tracing_enabled == "true") {
             String endpoint = System.getenv("OTEL_ENDPOINT");
             otel = Telemetry.initOpenTelemetry(endpoint);
+            logger.info("Tracing enabled");
+            return;
         }
+        logger.info("Tracing disabled");
     }
 
     public static void main(String[] args) throws IOException, InterruptedException {
@@ -146,7 +145,7 @@ public class DnsResolveService {
             }
         )
         .start();
-        
+
         // Start the RPC Server
         logger.info("DnsResolve Service starting...");
         System.out.println("starting again");
