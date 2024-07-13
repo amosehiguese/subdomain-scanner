@@ -1,0 +1,65 @@
+images:
+  repository: gcr.io/amosehiguese/subdomain-scanner
+  tag: "0.0.1"
+
+networkPolicies:
+  create: false
+
+apiQuerySvc:
+  create: true
+  name: apiquerysvc
+  port: 7000
+  resources:
+    requests:
+      cpu: 100m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi
+
+bruteSvc:
+  create: true
+  name: brutesvc
+  port: 3660
+  resources:
+    cpu: 200m
+    memory: 180Mi
+  limits:
+    cpu: 300m
+    memory: 300Mi
+
+dnsResolveSvc:
+  create: true
+  name: dnsresolvesvc
+  port: 6856
+  resources:
+    requests:
+      cpu: 200m
+      memory: 180Mi
+    limits:
+      cpu: 300m
+      memory: 300Mi
+
+frontend:
+  create: true
+  name: frontend
+  port: 8080
+  resources:
+    requests:
+      cpu: 100m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi
+
+portScanSvc:
+  create: true
+  name: portscansvc
+  port: 3666
+  resources:
+    requests:
+      cpu: 200m
+      memory: 180Mi
+    limits:
+      cpu: 300m
+      memory: 300Mi

@@ -1,0 +1,88 @@
+{{- if .Values.apiQuerySvc.create }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.apiQuerySvc.name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.apiQuerySvc.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.apiQuerySvc.name }}
+    spec:
+      terminationGracePeriodSeconds: 5
+      securityContext:
+        fsGroup: 1000
+        runAsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 1000
+      containers:
+      - name: server
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
+          privileged: false
+          readOnlyRootFilesystem: true
+        image: {{ .Values.images.repository }}/{{ .Values.apiQuerySvc.name }}:{{ .Values.images.tag | default .Chart.AppVersion}}
+        ports:
+        - containerPort: {{ .Values.apiQuerySvc.port }}
+        env:
+        - name: PORT
+          value: {{ .Values.apiQuerySvc.port }}
+        resources:
+          {{- toYaml .Values.apiQuerySvc.resources | nindent 10 -}}
+        readinessProbe:
+          initialDelaySeconds: 20
+          periodSeconds: 15
+          grpc:
+            port: {{ .Values.apiQuerySvc.port }}
+        livenessProbe:
+          initialDelaySeconds: 20
+          periodSeconds: 15
+          grpc:
+            port: {{ .Values.apiQuerySvc.port }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.apiQuerySvc.name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  type: ClusterIP
+  selector:
+    app: {{ .Values.apiQuerySvc.name }}
+  ports:
+  - name: grpc
+    port: {{ .Values.apiQuerySvc.port }}
+    targetPort: {{ .Values.apiQuerySvc.port }}
+{{- if .Values.networkPolicies.create }}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ .Values.apiQuerySvc.name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  podSelector:
+    matchLabels:
+      app: {{ .Values.apiQuerySvc.name }}
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: {{ .Values.frontend.name }}
+    ports:
+    - port: {{ .Values.frontend.port }}
+      protocol: TCP
+  egress:
+  - {}
+{{- end }}
+{{- end }}
