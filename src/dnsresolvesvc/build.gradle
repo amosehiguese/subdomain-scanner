@@ -20,6 +20,8 @@ java {
 def grpcVersion = '1.63.0'
 def protobufVersion = '3.25.1'
 def protocVersion = protobufVersion
+def jacksonCoreVersion = "2.17.0"
+def jacksonDatabindVersion = "2.17.0"
 
 ext {
   speed = project.hasProperty('speed') ? project.getProperty('speed') : false
@@ -34,7 +36,10 @@ dependencies {
     implementation "io.grpc:grpc-services:${grpcVersion}"
     implementation "io.grpc:grpc-stub:${grpcVersion}"
     compileOnly "org.apache.tomcat:annotations-api:6.0.53"
+    implementation "org.apache.logging.log4j:log4j-api:2.23.1"
     implementation "org.apache.logging.log4j:log4j-core:2.23.1"
+    implementation "org.apache.logging.log4j:log4j-layout-template-json:2.20.0"
+
      // Telemetry
     implementation "io.opentelemetry:opentelemetry-api:1.38.0"
     implementation "io.opentelemetry:opentelemetry-sdk:1.38.0"
@@ -48,6 +53,8 @@ dependencies {
     implementation "com.google.protobuf:protobuf-java-util:${protobufVersion}"
 
     runtimeOnly "io.grpc:grpc-netty-shaded:${grpcVersion}"
+    runtimeOnly "com.fasterxml.jackson.core:jackson-core:${jacksonCoreVersion}"
+    runtimeOnly "com.fasterxml.jackson.core:jackson-databind:${jacksonDatabindVersion}"
 
     testImplementation "io.grpc:grpc-testing:${grpcVersion}"
     testImplementation "io.grpc:grpc-inprocess:${grpcVersion}"
