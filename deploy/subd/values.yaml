@@ -5,6 +5,12 @@ images:
 networkPolicies:
   create: false
 
+oTelCollector:
+  create: false
+  name: otelcollector
+  port: 4317
+
+
 apiQuerySvc:
   create: true
   name: apiquerysvc
@@ -44,6 +50,7 @@ frontend:
   create: true
   name: frontend
   port: 8080
+  enableTracing: "0"
   resources:
     requests:
       cpu: 100m
