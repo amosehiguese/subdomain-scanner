@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 option java_package = "com.dnsresolve";
+package subdomain;
 
 service ResolveDnsService {
     rpc ResolveDns(ResolveDnsRequest) returns (stream ResolveDnsResponse) {};

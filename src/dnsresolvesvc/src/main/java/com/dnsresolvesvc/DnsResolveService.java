@@ -38,7 +38,7 @@ public class DnsResolveService {
     private static final DnsResolveService service = new DnsResolveService();
 
     private void start() throws IOException {
-        int port = Integer.parseInt(System.getenv().getOrDefault("PORT", "6856"));
+        int port = Integer.parseInt(System.getenv().getOrDefault("PORT", "50053"));
         healthMgr = new HealthStatusManager();
 
         server =
@@ -50,7 +50,6 @@ public class DnsResolveService {
             .start();
 
         logger.info("DnsResolve Service started, listening on " + port);
-        System.out.println("starting");
         Runtime.getRuntime()
             .addShutdownHook(
                 new Thread(
@@ -148,7 +147,6 @@ public class DnsResolveService {
 
         // Start the RPC Server
         logger.info("DnsResolve Service starting...");
-        System.out.println("starting again");
         final DnsResolveService service = DnsResolveService.getInstance();
         service.start();
         service.blockUntilShutdown();
