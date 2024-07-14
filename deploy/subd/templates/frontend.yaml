@@ -34,17 +34,33 @@ spec:
         env:
         - name: PORT
           value: {{ .Values.frontend.port }}
+        - name: APIQUERY_SERVICE_ADDR
+          value: "{{ .Values.apiQuerySvc.name }}:{{ .Values.apiQuerySvc.port }}"
+        - name: BRUTE_FORCE_SERVICE_ADDR
+          value: "{{ .Values.bruteSvc.name }}:{{ .Values.bruteSvc.port }}"
+        - name: DNS_RESOLVE_SERVER_ADDR
+          value: "{{ .Values.dnsResolveSvc.name }}:{{ .Values.dnsResolveSvc.port }}"
+        - name: PORT_SCAN_SERVICE_ADDR
+          value: "{{ .Values.portScanSvc.name }}:{{ .Values.portScanSvc.port }}"
+        - name: TRACING_ENABLED
+          value: "{{ .Values.frontend.enableTracing }}"
+        {{- if .Values.oTelCollector.create -}}
+        - name: OTEL_COLLECTOR_ADDR
+          values: "{{ .Values.oTelCollector.name }}:{{ .Values.oTelCollector.port }}"
+        - name: OTEL_SERVICE_NAME
+          values: "{{ .Values.frontend.name }}"
+
         resources:
           {{- toYaml .Values.frontend.resources | nindent 10 -}}
         readinessProbe:
-          initialDelaySeconds: 20
-          periodSeconds: 15
-          grpc:
+          initialDelaySeconds: 10
+          httpGet:
+            path: "/_healthz"
             port: {{ .Values.frontend.port }}
         livenessProbe:
           initialDelaySeconds: 20
-          periodSeconds: 15
-          grpc:
+          httpGet:
+            path: "/_healthz"
             port: {{ .Values.frontend.port }}
 ---
 apiVersion: v1
@@ -57,8 +73,8 @@ spec:
   selector:
     app: {{ .Values.frontend.name }}
   ports:
-  - name: grpc
-    port: {{ .Values.frontend.port }}
+  - name: http
+    port: 80
     targetPort: {{ .Values.frontend.port }}
 {{- if .Values.networkPolicies.create }}
 ---
