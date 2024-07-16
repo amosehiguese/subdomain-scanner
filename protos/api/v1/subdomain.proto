@@ -35,7 +35,7 @@ message BruteForceResponse {
 // -----------------Resolve DNS service-----------------
 
 service ResolveDnsService {
-    rpc ResolveDns(ResolveDnsRequest) returns (stream ResolveDnsResponse) {};
+    rpc ResolveDns(ResolveDnsRequest) returns (ResolveDnsResponse) {};
 }
 
 message ResolveDnsRequest {
@@ -43,7 +43,7 @@ message ResolveDnsRequest {
 }
 
 message ResolveDnsResponse {
-    string subdomain = 1;
+  repeated string subdomain = 1;
 }
 
 // -----------------Port Scan service-----------------

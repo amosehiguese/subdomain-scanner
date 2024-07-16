@@ -5,7 +5,7 @@ use futures::stream::StreamExt;
 use tokio_stream::Stream;
 use tonic::{Request, Response, Status, Streaming};
 use std::{net::{ToSocketAddrs, SocketAddr}, pin::Pin};
-use crate::subdomain::api::portscan::v1::{port_scan_service_server::PortScanService, Subdomain, Port, PortScanRequest};
+use crate::subdomain::{port_scan_service_server::PortScanService, Subdomain, Port, PortScanRequest};
 
 
 #[derive(Debug, Default)]
@@ -31,7 +31,6 @@ impl PortScanService for PortScanComponent {
                     .unwrap()
                     .next();
 
-
                 if let None = address {
                     yield Subdomain { domain: req.host.clone(), ports: vec![] };
                     continue
@@ -39,7 +38,7 @@ impl PortScanService for PortScanComponent {
 
                 let (input_tx, input_rx) = mpsc::channel::<u32>(buffer);
                 let (output_tx, output_rx) = mpsc::channel::<Port>(buffer);
-                
+
                 tokio::spawn(async move {
                     for port in consts::PORTS_LIST{
                         let _ = input_tx.send(*port).await;
@@ -55,7 +54,7 @@ impl PortScanService for PortScanComponent {
 
                         async move {
                             let port: Port = scan_port(address.unwrap(), port).await;
-                            if port.conn_open{
+                            if port.conn_open {
                                 let _ = output_tx.send(port).await;
                             }
                         }
@@ -64,8 +63,8 @@ impl PortScanService for PortScanComponent {
                 drop(output_tx);
 
                 let output_receiver_stream = tokio_stream::wrappers::ReceiverStream::new(output_rx);
-                
 
+                log::info!("scan completed for {:?}", req.host.clone());
                 yield Subdomain { domain: req.host.clone(), ports: output_receiver_stream.collect::<Vec<Port>>().await };
             }
         };

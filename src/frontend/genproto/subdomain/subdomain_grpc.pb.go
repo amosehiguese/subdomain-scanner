@@ -4,7 +4,7 @@
 // - protoc             v3.12.4
 // source: subdomain.proto
 
-package subdomain_v1
+package subdomain
 
 import (
 	context "context"
@@ -35,7 +35,7 @@ func NewApiQueryServiceClient(cc grpc.ClientConnInterface) ApiQueryServiceClient
 
 func (c *apiQueryServiceClient) GetSubdomainsByApiQuery(ctx context.Context, in *ApiQueryRequest, opts ...grpc.CallOption) (*ApiQueryResponse, error) {
 	out := new(ApiQueryResponse)
-	err := c.cc.Invoke(ctx, "/subdomain.v1.ApiQueryService/GetSubdomainsByApiQuery", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/subdomain.ApiQueryService/GetSubdomainsByApiQuery", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +80,7 @@ func _ApiQueryService_GetSubdomainsByApiQuery_Handler(srv interface{}, ctx conte
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/subdomain.v1.ApiQueryService/GetSubdomainsByApiQuery",
+		FullMethod: "/subdomain.ApiQueryService/GetSubdomainsByApiQuery",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ApiQueryServiceServer).GetSubdomainsByApiQuery(ctx, req.(*ApiQueryRequest))
@@ -92,7 +92,7 @@ func _ApiQueryService_GetSubdomainsByApiQuery_Handler(srv interface{}, ctx conte
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var ApiQueryService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "subdomain.v1.ApiQueryService",
+	ServiceName: "subdomain.ApiQueryService",
 	HandlerType: (*ApiQueryServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -121,7 +121,7 @@ func NewBruteServiceClient(cc grpc.ClientConnInterface) BruteServiceClient {
 
 func (c *bruteServiceClient) GetSubdomainsByBruteForce(ctx context.Context, in *BruteForceRequest, opts ...grpc.CallOption) (*BruteForceResponse, error) {
 	out := new(BruteForceResponse)
-	err := c.cc.Invoke(ctx, "/subdomain.v1.BruteService/GetSubdomainsByBruteForce", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/subdomain.BruteService/GetSubdomainsByBruteForce", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -166,7 +166,7 @@ func _BruteService_GetSubdomainsByBruteForce_Handler(srv interface{}, ctx contex
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/subdomain.v1.BruteService/GetSubdomainsByBruteForce",
+		FullMethod: "/subdomain.BruteService/GetSubdomainsByBruteForce",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BruteServiceServer).GetSubdomainsByBruteForce(ctx, req.(*BruteForceRequest))
@@ -178,7 +178,7 @@ func _BruteService_GetSubdomainsByBruteForce_Handler(srv interface{}, ctx contex
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var BruteService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "subdomain.v1.BruteService",
+	ServiceName: "subdomain.BruteService",
 	HandlerType: (*BruteServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -194,7 +194,7 @@ var BruteService_ServiceDesc = grpc.ServiceDesc{
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ResolveDnsServiceClient interface {
-	ResolveDns(ctx context.Context, in *ResolveDnsRequest, opts ...grpc.CallOption) (ResolveDnsService_ResolveDnsClient, error)
+	ResolveDns(ctx context.Context, in *ResolveDnsRequest, opts ...grpc.CallOption) (*ResolveDnsResponse, error)
 }
 
 type resolveDnsServiceClient struct {
@@ -205,43 +205,20 @@ func NewResolveDnsServiceClient(cc grpc.ClientConnInterface) ResolveDnsServiceCl
 	return &resolveDnsServiceClient{cc}
 }
 
-func (c *resolveDnsServiceClient) ResolveDns(ctx context.Context, in *ResolveDnsRequest, opts ...grpc.CallOption) (ResolveDnsService_ResolveDnsClient, error) {
-	stream, err := c.cc.NewStream(ctx, &ResolveDnsService_ServiceDesc.Streams[0], "/subdomain.v1.ResolveDnsService/ResolveDns", opts...)
+func (c *resolveDnsServiceClient) ResolveDns(ctx context.Context, in *ResolveDnsRequest, opts ...grpc.CallOption) (*ResolveDnsResponse, error) {
+	out := new(ResolveDnsResponse)
+	err := c.cc.Invoke(ctx, "/subdomain.ResolveDnsService/ResolveDns", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &resolveDnsServiceResolveDnsClient{stream}
-	if err := x.ClientStream.SendMsg(in); err != nil {
-		return nil, err
-	}
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
-	return x, nil
-}
-
-type ResolveDnsService_ResolveDnsClient interface {
-	Recv() (*ResolveDnsResponse, error)
-	grpc.ClientStream
-}
-
-type resolveDnsServiceResolveDnsClient struct {
-	grpc.ClientStream
-}
-
-func (x *resolveDnsServiceResolveDnsClient) Recv() (*ResolveDnsResponse, error) {
-	m := new(ResolveDnsResponse)
-	if err := x.ClientStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
+	return out, nil
 }
 
 // ResolveDnsServiceServer is the server API for ResolveDnsService service.
 // All implementations must embed UnimplementedResolveDnsServiceServer
 // for forward compatibility
 type ResolveDnsServiceServer interface {
-	ResolveDns(*ResolveDnsRequest, ResolveDnsService_ResolveDnsServer) error
+	ResolveDns(context.Context, *ResolveDnsRequest) (*ResolveDnsResponse, error)
 	mustEmbedUnimplementedResolveDnsServiceServer()
 }
 
@@ -249,8 +226,8 @@ type ResolveDnsServiceServer interface {
 type UnimplementedResolveDnsServiceServer struct {
 }
 
-func (UnimplementedResolveDnsServiceServer) ResolveDns(*ResolveDnsRequest, ResolveDnsService_ResolveDnsServer) error {
-	return status.Errorf(codes.Unimplemented, "method ResolveDns not implemented")
+func (UnimplementedResolveDnsServiceServer) ResolveDns(context.Context, *ResolveDnsRequest) (*ResolveDnsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ResolveDns not implemented")
 }
 func (UnimplementedResolveDnsServiceServer) mustEmbedUnimplementedResolveDnsServiceServer() {}
 
@@ -265,41 +242,37 @@ func RegisterResolveDnsServiceServer(s grpc.ServiceRegistrar, srv ResolveDnsServ
 	s.RegisterService(&ResolveDnsService_ServiceDesc, srv)
 }
 
-func _ResolveDnsService_ResolveDns_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(ResolveDnsRequest)
-	if err := stream.RecvMsg(m); err != nil {
-		return err
+func _ResolveDnsService_ResolveDns_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ResolveDnsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
 	}
-	return srv.(ResolveDnsServiceServer).ResolveDns(m, &resolveDnsServiceResolveDnsServer{stream})
-}
-
-type ResolveDnsService_ResolveDnsServer interface {
-	Send(*ResolveDnsResponse) error
-	grpc.ServerStream
-}
-
-type resolveDnsServiceResolveDnsServer struct {
-	grpc.ServerStream
-}
-
-func (x *resolveDnsServiceResolveDnsServer) Send(m *ResolveDnsResponse) error {
-	return x.ServerStream.SendMsg(m)
+	if interceptor == nil {
+		return srv.(ResolveDnsServiceServer).ResolveDns(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/subdomain.ResolveDnsService/ResolveDns",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ResolveDnsServiceServer).ResolveDns(ctx, req.(*ResolveDnsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 // ResolveDnsService_ServiceDesc is the grpc.ServiceDesc for ResolveDnsService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var ResolveDnsService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "subdomain.v1.ResolveDnsService",
+	ServiceName: "subdomain.ResolveDnsService",
 	HandlerType: (*ResolveDnsServiceServer)(nil),
-	Methods:     []grpc.MethodDesc{},
-	Streams: []grpc.StreamDesc{
+	Methods: []grpc.MethodDesc{
 		{
-			StreamName:    "ResolveDns",
-			Handler:       _ResolveDnsService_ResolveDns_Handler,
-			ServerStreams: true,
+			MethodName: "ResolveDns",
+			Handler:    _ResolveDnsService_ResolveDns_Handler,
 		},
 	},
+	Streams:  []grpc.StreamDesc{},
 	Metadata: "subdomain.proto",
 }
 
@@ -319,7 +292,7 @@ func NewPortScanServiceClient(cc grpc.ClientConnInterface) PortScanServiceClient
 }
 
 func (c *portScanServiceClient) ScanForOpenPorts(ctx context.Context, opts ...grpc.CallOption) (PortScanService_ScanForOpenPortsClient, error) {
-	stream, err := c.cc.NewStream(ctx, &PortScanService_ServiceDesc.Streams[0], "/subdomain.v1.PortScanService/ScanForOpenPorts", opts...)
+	stream, err := c.cc.NewStream(ctx, &PortScanService_ServiceDesc.Streams[0], "/subdomain.PortScanService/ScanForOpenPorts", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -407,7 +380,7 @@ func (x *portScanServiceScanForOpenPortsServer) Recv() (*PortScanRequest, error)
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var PortScanService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "subdomain.v1.PortScanService",
+	ServiceName: "subdomain.PortScanService",
 	HandlerType: (*PortScanServiceServer)(nil),
 	Methods:     []grpc.MethodDesc{},
 	Streams: []grpc.StreamDesc{

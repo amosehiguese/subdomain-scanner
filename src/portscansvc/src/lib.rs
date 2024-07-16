@@ -6,28 +6,20 @@ pub mod consts;
 use anyhow::Ok;
 use tonic::transport::Server;
 use std::net::SocketAddr;
-use subdomain::api::portscan::v1::port_scan_service_server::PortScanServiceServer;
+use subdomain::port_scan_service_server::PortScanServiceServer;
 
 
 pub mod subdomain {
-    pub mod api {
-        pub mod portscan {
-            pub mod v1 {
-                tonic::include_proto!("subdomain.api.portscan.v1");
-            }
-        }
-    }
+    tonic::include_proto!("subdomain");
 }
 
 pub async fn init_grpc_server(portscan: portscan::PortScanComponent, addr: SocketAddr) -> Result<(), anyhow::Error> {
     let (_, health_service) = tonic_health::server::health_reporter();
-    tracing_log::log::info!("Starting grpc server...");
+    tracing_log::log::info!("Starting grpc server at {:?}...", addr);
     Server::builder()
         .add_service(health_service)
         .add_service(PortScanServiceServer::new(portscan))
         .serve(addr)
         .await?;
-
-    tracing_log::log::info!("Grpc server running...");
     Ok(())
 }

@@ -1,4 +1,4 @@
-package com.dnsresolvesvc;
+package com.subdomain;
 
 import io.grpc.BindableService;
 import io.grpc.Server;
@@ -13,14 +13,16 @@ import io.grpc.stub.StreamObserver;
 import io.opentelemetry.api.OpenTelemetry;
 import io.opentelemetry.instrumentation.grpc.v1_6.GrpcTelemetry;
 
+import java.util.List;
+import java.util.ArrayList;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-
-import com.dnsresolve.Resolvedns.ResolveDnsRequest;
-import com.dnsresolve.Resolvedns.ResolveDnsResponse;
-import com.dnsresolve.ResolveDnsServiceGrpc.ResolveDnsServiceImplBase;
+import com.subdomain.Resolvedns.ResolveDnsRequest;
+import com.subdomain.Resolvedns.ResolveDnsResponse;
+import com.subdomain.Resolvedns.ResolveDnsResponseOrBuilder;
+import com.subdomain.ResolveDnsServiceGrpc.ResolveDnsServiceImplBase;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -88,14 +90,16 @@ public class DnsResolveService {
     private static class DnsResolveServiceImpl extends ResolveDnsServiceImplBase {
         @Override
         public void resolveDns(ResolveDnsRequest request, StreamObserver<ResolveDnsResponse> responseObserver) {
-            logger.info("received " + request.getHostsCount() + "new dns to resolve");
+            logger.info("received " + request.getHostsCount() + " new dns to resolve");
             try {
+                List<String> result = new ArrayList<>();
                 for (String host: request.getHostsList()){
                     if (resolves(host)) {
-                        ResolveDnsResponse resp = ResolveDnsResponse.newBuilder().setSubdomain(host).build();
-                        responseObserver.onNext(resp);
+                        result.add(host);
                     }
                 }
+                ResolveDnsResponse resp = ResolveDnsResponse.newBuilder().addAllSubdomain(result).build();
+                responseObserver.onNext(resp);
                 responseObserver.onCompleted();
             } catch (StatusRuntimeException e) {
                 logger.log(Level.WARN, "Failed with status {}", e.getStatus());

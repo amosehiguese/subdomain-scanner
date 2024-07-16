@@ -247,7 +247,7 @@ a {
     }
 
     #text-span {
-        padding: 0px;    
+        padding: 0px;
     }
     #crusty-message {
         font-size: 1.2rem;
@@ -281,7 +281,7 @@ a {
     }
     #text-span {
         padding: 0px;
-        align-self: center;        
+        align-self: center;
     }
     #crusty-message {
         font-size: 1.2rem;
@@ -330,7 +330,7 @@ a {
 }
 
 .about, .source-code {
-    
+
     cursor: pointer;
 }
 

@@ -21,7 +21,7 @@ pub struct Config{
 
     #[envconfig(
         from = "LISTEN_ADDR",
-        default = "[::1]:3666"
+        default = "0.0.0.0:50054"
     )]
     pub listen_addr: SocketAddr,
 }

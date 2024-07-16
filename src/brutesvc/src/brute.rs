@@ -4,9 +4,9 @@ use futures::StreamExt;
 use std::{fs::File, io::{BufRead, BufReader}};
 use tonic::{Request, Response, Status};
 use tokio_stream::wrappers::ReceiverStream;
-use crate::{errors::SourceFileError, subdomain::api::brute::v1::{brute_service_server::BruteService, BruteForceRequest, BruteForceResponse}};
+use crate::{errors::SourceFileError, subdomain::{brute_service_server::BruteService, BruteForceRequest, BruteForceResponse}};
 
-#[derive(Debug, Default, Clone)] 
+#[derive(Debug, Default, Clone)]
 pub struct BruteForceComponent {}
 
 #[derive(Debug)]
@@ -30,11 +30,11 @@ impl SourceFile {
 impl BruteService for BruteForceComponent {
     #[tracing::instrument(skip_all)]
     async fn get_subdomains_by_brute_force(
-        &self, 
+        &self,
         request: Request<BruteForceRequest>,
     ) -> Result<Response<BruteForceResponse>, Status>{
         log::info!("Performing subdomain enumeration by using brute force from words.txt");
-        
+
         let subdomains: Vec<String>;
         let _source = SourceFile::new("./words.txt");
         println!("{:?}", _source.reader());
@@ -45,7 +45,7 @@ impl BruteService for BruteForceComponent {
                 let (input_tx, input_rx ) = mpsc::channel::<String>(buffer);
                 let (output_tx, output_rx ) = mpsc::channel::<String>(buffer);
 
-                
+
             tokio::spawn(async move {
                 for line in reader.lines() {
                     if let Ok(line) = line{
@@ -55,8 +55,8 @@ impl BruteService for BruteForceComponent {
                 }
                 drop(input_tx);
             });
-    
-        
+
+
             let target = request.get_ref().target.as_str();
             if target.is_empty() {
                 return Err(Status::invalid_argument("invalid argument provided"));
@@ -72,7 +72,7 @@ impl BruteService for BruteForceComponent {
                     }
                 })
                 .await;
-                
+
                 drop(output_tx);
 
                 let output_rx_stream = ReceiverStream::new(output_rx);
@@ -85,7 +85,7 @@ impl BruteService for BruteForceComponent {
                 log::error!("error trying to get reader -> {}", e);
                 return Err(Status::internal("error trying to get reader"))
             }
-        }  
+        }
 
         Ok(Response::new(BruteForceResponse{subdomains: subdomains}))
     }
