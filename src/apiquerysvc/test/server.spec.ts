@@ -10,7 +10,7 @@ import * as mocha from 'mocha';
 
 class MockApiQueryComponent implements ApiQueryServiceMethods {
 
-    async getSubdomainsByApiQuery(call: grpc.ServerUnaryCall<ApiQueryRequest, ApiQueryResponse>, callback: grpc.sendUnaryData<ApiQueryResponse>) {
+    async GetSubdomainsByApiQuery(call: grpc.ServerUnaryCall<ApiQueryRequest, ApiQueryResponse>, callback: grpc.sendUnaryData<ApiQueryResponse>) {
         const {target} = call.request;
         if (!target) {
             callback({
@@ -28,7 +28,7 @@ class MockApiQueryComponent implements ApiQueryServiceMethods {
 
 function startup(port: string, server: grpc.Server){
     const apiQueryComponent = new MockApiQueryComponent();
-    const getSubdomainsByApiQuery = apiQueryComponent.getSubdomainsByApiQuery
+    const getSubdomainsByApiQuery = apiQueryComponent.GetSubdomainsByApiQuery
     server.addService(apiQueryProto.ApiQueryService.service, {getSubdomainsByApiQuery});
 
     server.bindAsync(
@@ -37,7 +37,7 @@ function startup(port: string, server: grpc.Server){
         (err, port) => {
             if (err) {
                 logger.error(`Got an error starting server -> ${err}`);
-                return 
+                return
             }
             logger.info(`ApiQuerySvc gRPC server started on port ${port}`);
         }
@@ -66,7 +66,7 @@ mocha.describe('ApiQueryService Server Test', ()=>{
         const request = {
             target: "vmrw.com"
         };
-    
+
         client.getSubdomainsByApiQuery(request, (err: grpc.ServiceError | null, resp: ApiQueryResponse__Output | undefined) => {
             expect(resp?.subdomains).to.have.lengthOf(2);
             done()
@@ -77,7 +77,7 @@ mocha.describe('ApiQueryService Server Test', ()=>{
         const request = {
             target: ""
         };
-    
+
         client.getSubdomainsByApiQuery(request, (err: grpc.ServiceError | null, resp: ApiQueryResponse__Output | undefined) => {
             const statusR = grpc.status.INVALID_ARGUMENT
             expect(err?.code).to.equal(statusR);

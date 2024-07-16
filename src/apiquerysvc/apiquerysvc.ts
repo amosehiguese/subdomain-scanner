@@ -23,11 +23,11 @@ type crtshResponse = {
 }
 
 export interface ApiQueryServiceMethods {
-    getSubdomainsByApiQuery(call: grpc.ServerUnaryCall<ApiQueryRequest, ApiQueryResponse>, callback: grpc.sendUnaryData<ApiQueryResponse>): void;
+  GetSubdomainsByApiQuery(call: grpc.ServerUnaryCall<ApiQueryRequest, ApiQueryResponse>, callback: grpc.sendUnaryData<ApiQueryResponse>): void;
 }
 
 export class ApiQueryComponent implements ApiQueryServiceMethods {
-    public async getSubdomainsByApiQuery(call: grpc.ServerUnaryCall<ApiQueryRequest, ApiQueryResponse>, callback: grpc.sendUnaryData<ApiQueryResponse>) {
+    public async GetSubdomainsByApiQuery(call: grpc.ServerUnaryCall<ApiQueryRequest, ApiQueryResponse>, callback: grpc.sendUnaryData<ApiQueryResponse>) {
         const {target} = call.request;
         if (!target) {
             callback({
@@ -38,10 +38,10 @@ export class ApiQueryComponent implements ApiQueryServiceMethods {
         }
 
         const url = `https://crt.sh/?q=%25.${target}&output=json`;
-        
+
         const data  = await fetchData<crtshResponse>(url);
         const subdomains = new Set<string>(data.map((d: crtshResponse) => d.common_name))
-        
+
         const response: Response = {
             subdomains: [...subdomains]
         }

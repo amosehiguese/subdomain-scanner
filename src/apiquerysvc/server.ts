@@ -39,7 +39,7 @@ import { HealthCheckResponse} from './proto/grpc/grpc/health/v1/HealthCheckRespo
 
 type GrpcType = ProtoGrpcType | HealthProtoGrpcType
 
-// Helper function that loads a protobuf file. 
+// Helper function that loads a protobuf file.
 const _loadProto = (path: string): GrpcType => {
     const packageDefinition = protoLoader.loadSync(
         path,
@@ -58,9 +58,9 @@ const _loadProto = (path: string): GrpcType => {
 const MAIN_PROTO_PATH = path.join(__dirname, './proto/api/v1/apiquery.proto');
 const HEALTH_PROTO_PATH = path.join(__dirname, './proto/grpc/health/v1/health.proto');
 
-const PORT = process.env.PORT || 7000;
+const PORT = process.env.PORT || 50051;
 
-export const apiQueryProto = (_loadProto(MAIN_PROTO_PATH) as ProtoGrpcType).subdomain.api.apiquery.v1;
+export const apiQueryProto = (_loadProto(MAIN_PROTO_PATH) as ProtoGrpcType).subdomain;
 const health = (_loadProto(HEALTH_PROTO_PATH) as HealthProtoGrpcType).grpc.health.v1;
 
 const check = (call:grpc.ServerUnaryCall<HealthCheckRequest, HealthCheckResponse>, callback:grpc.sendUnaryData<HealthCheckResponse>): void => {
@@ -78,7 +78,7 @@ const main = () => {
         (err, port) => {
             if (err) {
                 logger.error(`Got an error starting server -> ${err}`);
-                return 
+                return
             }
             logger.info(`ApiQuerySvc gRPC server started on port ${port}`);
         }
@@ -88,8 +88,8 @@ const main = () => {
 const _getServer = () => {
     const server = new grpc.Server();
     const apiQueryComponent = new ApiQueryComponent();
-    const getSubdomainsByApiQuery = apiQueryComponent.getSubdomainsByApiQuery
-    server.addService(apiQueryProto.ApiQueryService.service, {getSubdomainsByApiQuery});
+    const GetSubdomainsByApiQuery = apiQueryComponent.GetSubdomainsByApiQuery
+    server.addService(apiQueryProto.ApiQueryService.service, {GetSubdomainsByApiQuery});
     server.addService(health.Health.service, {check});
 
     return server;

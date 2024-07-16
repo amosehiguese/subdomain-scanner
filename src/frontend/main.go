@@ -54,7 +54,7 @@ type frontendServer struct {
 	otelCollectorAddr string
 	otelCollectorConn *grpc.ClientConn
 
-	// cyberAssistantSvcAddr string
+	// aiAssistantSvcAddr string
 }
 
 func main() {

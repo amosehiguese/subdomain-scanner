@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package subdomain.api.brute.v1;
+package subdomain;
 
 service BruteService {
     rpc GetSubdomainsByBruteForce(BruteForceRequest) returns (BruteForceResponse) {}

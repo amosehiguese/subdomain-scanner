@@ -69,7 +69,8 @@ protobuf {
         grpc { artifact = "io.grpc:protoc-gen-grpc-java:${grpcVersion}" }
     }
     generateProtoTasks {
-        all()*.plugins { grpc {} }
+      all()*.plugins { grpc {} }
+      ofSourceSet('main')
     }
 }
 
@@ -77,8 +78,9 @@ protobuf {
 sourceSets {
     main {
         java {
-            srcDirs 'build/generated/source/proto/main/grpc/com/dnsresolvesvc'
-            srcDirs 'build/generated/source/proto/main/java/com/dnsresolvesvc'
+            srcDirs 'com/subdomain'
+            srcDirs 'build/generated/source/proto/main/grpc/com/subdomain'
+            srcDirs 'build/generated/source/proto/main/java/com/subdomain'
         }
     }
 }
@@ -114,4 +116,4 @@ def createStartScripts(String mainClassName) {
     }
 }
 
-createStartScripts('com.dnsresolvesvc.DnsResolveService')
+createStartScripts('com.subdomain.DnsResolveService')

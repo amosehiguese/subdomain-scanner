@@ -4,14 +4,14 @@ import (
 	"context"
 	"io"
 	"net/http"
-	"time"
 
-	pb "github.com/amosehiguese/subdomain-scanner/src/frontend/genproto/subdomain_v1"
+	pb "github.com/amosehiguese/subdomain-scanner/src/frontend/genproto/subdomain"
 	"go.uber.org/zap"
 )
 
 func (fe *frontendServer) getSubdomainsByApiQuery(ctx context.Context, target string) ([]string, error) {
-	response, err := pb.NewApiQueryServiceClient(fe.apiQuerySvcConn).GetSubdomainsByApiQuery(ctx, &pb.ApiQueryRequest{Target: target})
+	conn := pb.NewApiQueryServiceClient(fe.apiQuerySvcConn)
+	response, err := conn.GetSubdomainsByApiQuery(ctx, &pb.ApiQueryRequest{Target: target})
 	if err != nil {
 		return nil, err
 	}
@@ -23,29 +23,16 @@ func (fe *frontendServer) getSubdomainsByBruteForce(ctx context.Context, target 
 	if err != nil {
 		return nil, err
 	}
-
 	return response.Subdomains, nil
 }
 
 func (fe *frontendServer) resolveDNS(ctx context.Context, hosts []string) ([]string, error) {
-	response, err := pb.NewResolveDnsServiceClient(fe.bruteForceSvcConn).ResolveDns(ctx, &pb.ResolveDnsRequest{Hosts: hosts})
+	response, err := pb.NewResolveDnsServiceClient(fe.dnsResolveSvcConn).ResolveDns(ctx, &pb.ResolveDnsRequest{Hosts: hosts})
 	if err != nil {
 		return nil, err
 	}
 
-	var result []string
-	for {
-		resolveDnsResponse, err := response.Recv()
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			return nil, err
-		}
-
-		result = append(result, resolveDnsResponse.Subdomain)
-	}
-	return result, nil
+	return response.Subdomain, nil
 }
 
 func (fe *frontendServer) portScan(ctx context.Context, hosts []string) ([]Subdomain, error) {
@@ -54,14 +41,13 @@ func (fe *frontendServer) portScan(ctx context.Context, hosts []string) ([]Subdo
 		return nil, err
 	}
 
-	waitc := make(chan struct{})
-	result := make(chan *pb.Subdomain)
+	result := make(chan *pb.Subdomain, 200)
 
 	go func() {
 		for {
 			in, err := stream.Recv()
 			if err == io.EOF {
-				close(waitc)
+				close(result)
 				return
 			}
 			if err != nil {
@@ -76,6 +62,7 @@ func (fe *frontendServer) portScan(ctx context.Context, hosts []string) ([]Subdo
 			return nil, err
 		}
 	}
+	stream.CloseSend()
 
 	var subdomains []Subdomain
 	for subdomain := range result {
@@ -83,6 +70,7 @@ func (fe *frontendServer) portScan(ctx context.Context, hosts []string) ([]Subdo
 			Domain: subdomain.Domain,
 			Ports:  subdomain.Ports,
 		}
+
 		subdomains = append(subdomains, subd)
 	}
 
@@ -93,8 +81,8 @@ func (fe *frontendServer) scan(r *http.Request, domain string) ([]Subdomain, err
 	zapLog := r.Context().Value(ctxKeyLog{}).(*zap.Logger)
 	var result []string
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*20)
-	defer cancel()
+	ctx := r.Context()
+
 	subdomains, err := fe.getSubdomainsByApiQuery(ctx, domain)
 	if err != nil {
 		zapLog.With(
@@ -107,16 +95,16 @@ func (fe *frontendServer) scan(r *http.Request, domain string) ([]Subdomain, err
 
 	result = append(result, subdomains...)
 
-	subdomains, err = fe.getSubdomainsByBruteForce(ctx, domain)
-	if err != nil {
-		zapLog.With(
-			zap.Field(
-				zap.Error(err),
-			),
-		).Error("Failed to get subdomain by brute force.")
-	}
+	// subdomains, err = fe.getSubdomainsByBruteForce(ctx, domain)
+	// if err != nil {
+	// 	zapLog.With(
+	// 		zap.Field(
+	// 			zap.Error(err),
+	// 		),
+	// 	).Error("Failed to get subdomain by brute force.")
+	// }
 
-	result = append(result, subdomains...)
+	// result = append(result, subdomains...)
 
 	result, err = fe.resolveDNS(ctx, result)
 	if err != nil {
@@ -140,6 +128,5 @@ func (fe *frontendServer) scan(r *http.Request, domain string) ([]Subdomain, err
 
 		return nil, err
 	}
-
 	return subds, nil
 }

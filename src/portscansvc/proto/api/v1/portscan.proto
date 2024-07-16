@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package subdomain.api.portscan.v1;
+package subdomain;
 
 service PortScanService {
     rpc ScanForOpenPorts(stream PortScanRequest) returns (stream Subdomain) {};
