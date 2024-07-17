@@ -53,6 +53,13 @@ This tool provides a way to gather valuable information that can be used for sec
 
 <br/>
 
+## Architecture
+
+<p align="center">
+  <img src="assets/withbrute.png" alt="Application Banner" width="640" >
+</p>
+
+
 
 ## How It Works
 
@@ -61,22 +68,22 @@ The user initiates a POST request containing the target domain. Upon receiving t
 ### Steps in the `scan` Method:
 
 1. **Subdomain Discovery:**
-   - The arguments are passed to `apiQuerySvc` and `bruteSvc`, which both return lists of subdomains. These lists are combined into a single result.
+   - The arguments are passed to `apiQuerySvc`, `aiSvc`, and `bruteSvc`, which both return lists of subdomains. These lists are combined into a single result.
 
 2. **DNS Resolution:**
-   - The combined subdomain list is passed to `resolveDnsSvc`, which resolves the subdomains into their corresponding DNS addresses.
+   - The combined subdomain list is passed to `dnsResolveSvc`, which resolves the subdomains into their corresponding DNS addresses and then streams the output to the `portScanSvc`.
 
 3. **Port Scanning:**
-   - The resolved DNS addresses are sent to `portScanSvc` for scanning open ports. This service returns a refined list of subdomains, each annotated with its open ports.
+   - Here each subdomain are scanned for open ports and streamed back to the `dnsResolveSvc`.
 
 4. **Response Construction:**
-   - The final list, including subdomains and their open ports, is sent back as a response to the client.
+   - The final list, including subdomains and their open ports, is sent back as a response to the `frontend`.
 
 | Service                                              | Language      | Description                                                                                                                       |
 | ---------------------------------------------------- | ------------- | --------------------------------------------------------------------------------------------------------------------------------- |
 | [frontend](/src/frontend)                           | Go            | Exposes an HTTP server to serve the website.|
 | [apiqueryservice](/src/apiquerysvc)                     | Typescript            | Queries external api to get associated subdomains                                                           |
-| [bruteforceservice](/src/brutesvc) | Rust           | Uses the brute force methodology of finding subdomains                       |
+| [bruteservice](/src/brutesvc) | Rust           | Uses the brute force methodology of finding subdomains                       |
 | [dnsresolveservice](/src/dnsresolvesvc)             | Java       | Responsible for resolving domain names to its ip addresses |
 | [portscanservice](/src/portscansvc)               | Rust       | Responsible for scanning subdomains for open ports                                    |
 | [aiservice](/src/aisvc)             | Python           | Responsible for performing semantic understanding using embeddings generated from target domain analysis                                |
