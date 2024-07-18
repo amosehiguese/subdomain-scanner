@@ -3,17 +3,17 @@ name: "DnsResolve CI"
 on:
   workflow_dispatch:
   workflow_call:
-    push:
-      branches:
-        - main
-      paths:
-        - 'src/dnsresolvesvc/**'
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/dnsresolvesvc/**'
 
-    pull_request:
-      branches:
-        - main
-      paths:
-        - 'src/dnsresolvesvc/**'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'src/dnsresolvesvc/**'
 
 permissions:
   contents: read
