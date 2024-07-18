@@ -38,7 +38,6 @@ jobs:
       contents: read
       pull-requests: read
       checks: write
-
   portscan-integration:
     uses: ./.github/workflows/portscan-integration-workflow.yml
     permissions:
