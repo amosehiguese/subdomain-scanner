@@ -14,7 +14,7 @@ oTelCollector:
 apiQuerySvc:
   create: true
   name: apiquerysvc
-  port: 7000
+  port: 50051
   resources:
     requests:
       cpu: 100m
@@ -26,7 +26,7 @@ apiQuerySvc:
 bruteSvc:
   create: true
   name: brutesvc
-  port: 3660
+  port: 50052
   resources:
     cpu: 200m
     memory: 180Mi
@@ -37,7 +37,7 @@ bruteSvc:
 dnsResolveSvc:
   create: true
   name: dnsresolvesvc
-  port: 6856
+  port: 50053
   resources:
     requests:
       cpu: 200m
@@ -62,7 +62,7 @@ frontend:
 portScanSvc:
   create: true
   name: portscansvc
-  port: 3666
+  port: 50054
   resources:
     requests:
       cpu: 200m

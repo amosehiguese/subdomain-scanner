@@ -44,7 +44,7 @@ function startup(port: string, server: grpc.Server){
     )
 }
 
-const port = "50051";
+const port = "50055";
 
 mocha.describe('ApiQueryService Server Test', ()=>{
     let client: ApiQueryServiceClient;
@@ -52,7 +52,6 @@ mocha.describe('ApiQueryService Server Test', ()=>{
 
     before(done => {
         server = new grpc.Server();
-        logger.info("here")
         startup(port, server);
         client = new apiQueryProto.ApiQueryService(`[::]:${port}`, grpc.credentials.createInsecure());
         done()

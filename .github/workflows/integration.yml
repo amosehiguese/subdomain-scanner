@@ -1,0 +1,41 @@
+name: "Subdomain Integration Workflow"
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  apiquery-integration:
+    uses: ./.github/workflows/svc/apiquery/apiquery-integration-workflow.yml
+    permissions:
+      contents: read
+      checks: write
+  dnsresolve-integration:
+    uses: ./.github/workflows/svc/dnsresolve/dnsresolve-integration-workflow.yml
+    permissions:
+      contents: read
+      checks: write
+  brute-integration:
+    uses: ./.github/workflows/svc/brute/brute-integration-workflow.yml
+    permissions:
+      contents: read
+      checks: write
+  frontend-integration:
+    uses: ./.github/workflows/svc/frontend/frontend-integration-workflow.yml
+    permissions:
+      contents: read
+      checks: write
+  ai-integration:
+    uses: ./.github/workflows/svc/ai/ai-integration-workflow.yml
+    permissions:
+      contents: read
+      checks: write
+
+  portscan-integration:
+    uses: ./.github/workflows/svc/portscan/portscan-integration-workflow.yml
+    permissions:
+      contents: read
+      checks: write

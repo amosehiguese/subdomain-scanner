@@ -1,0 +1,50 @@
+name: "DnsResolve CI"
+
+on:
+  workflow_dispatch:
+  workflow_call:
+    push:
+      branches:
+        - main
+      paths:
+        - 'src/dnsresolvesvc/**'
+
+    pull_request:
+      branches:
+        - main
+      paths:
+        - 'src/dnsresolvesvc/**'
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Cache Gradle packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties')}}
+          restore-keys: ${{ runner.os }}-gradle-
+
+      - name: Run tests with Gradle
+        run: ./gradlew test --junit-xml=junit.xml
+
+      - name: Publish Test Report
+        uses: mikepenz/action-junit-report@v3
+        if: success() || failure()
+        with:
+          report_paths: '**/junit.xml'
+          detailed_summary: true
+          include_passed: true

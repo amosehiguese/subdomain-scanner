@@ -1,0 +1,29 @@
+apiVersion: skaffold/v4beta11
+kind: Config
+metadata:
+  name: subdomain-scanner
+build:
+  artifacts:
+    - image: apiquerysvc
+      context: src/apiquerysvc
+    - image: brutesvc
+      context: src/brutesvc
+    - image: dnsresolvesvc
+      context: src/dnsresolvesvc
+    - image: portscansvc
+      context: src/portscansvc
+    - image: frontend
+      context: src/frontend
+  tagPolicy:
+    gitCommit: {}
+  local:
+    useBuildkit: false
+
+deploy:
+  helm:
+    releases:
+      - name: subd
+        chartPath: deploy/subd
+        valuesFiles:
+          - deploy/subd/values.yaml
+        version: 0.1.0

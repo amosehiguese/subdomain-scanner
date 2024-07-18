@@ -1,0 +1,33 @@
+name: "Subdomain Pipeline"
+on:
+  push:
+    branches:
+      - main
+      - release/*
+    tags:
+      - 'v*.*.*'
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  integration:
+    uses: ./.github/workflows/integration.yml
+    permissions:
+      contents: read
+      checks: write
+
+  delivery:
+    needs: [integration]
+    uses: ./.github/workflows/delivery.yml
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+
+
