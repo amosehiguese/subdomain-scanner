@@ -9,33 +9,33 @@ permissions:
 
 jobs:
   apiquery-integration:
-    uses: ./.github/workflows/svc/apiquery/apiquery-integration-workflow.yml
+    uses: ./.github/workflows/apiquery-integration-workflow.yml
     permissions:
       contents: read
       checks: write
   dnsresolve-integration:
-    uses: ./.github/workflows/svc/dnsresolve/dnsresolve-integration-workflow.yml
+    uses: ./.github/workflows/dnsresolve-integration-workflow.yml
     permissions:
       contents: read
       checks: write
   brute-integration:
-    uses: ./.github/workflows/svc/brute/brute-integration-workflow.yml
+    uses: ./.github/workflows/brute-integration-workflow.yml
     permissions:
       contents: read
       checks: write
   frontend-integration:
-    uses: ./.github/workflows/svc/frontend/frontend-integration-workflow.yml
+    uses: ./.github/workflows/frontend-integration-workflow.yml
     permissions:
       contents: read
       checks: write
   ai-integration:
-    uses: ./.github/workflows/svc/ai/ai-integration-workflow.yml
+    uses: ./.github/workflows/ai-integration-workflow.yml
     permissions:
       contents: read
       checks: write
 
   portscan-integration:
-    uses: ./.github/workflows/svc/portscan/portscan-integration-workflow.yml
+    uses: ./.github/workflows/portscan-integration-workflow.yml
     permissions:
       contents: read
       checks: write
