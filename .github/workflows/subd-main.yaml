@@ -1,0 +1,69 @@
+name: "Subdomain Enumeration CI"
+on:
+  push:
+    branches:
+      - main
+      - release/*
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.10"
+
+      - name: Run Rust test
+        timeout-minutes: 10
+        run: |
+          pushd src/brutesvc
+          cargo test --all-features
+          popd
+
+      - name: Run Go test
+        timeout-minutes: 5
+        run: |
+          pushd src/frontend
+          go test
+          popd
+
+      - name: Run Java test
+        timeout-minutes: 10
+        run: |
+          pushd src/dnsresolvesvc
+          ./gradlew test
+          popd
+
+      - name: Run Python test
+        timeout-minutes: 10
+        run: |
+          pushd src/aiservice
+          python -m pytest --verbose
+          popd
+
+      - name: Run Node test
+        timeout-minutes: 10
+        run: |
+          pushd src/apiquerysvc
+          npm i -g yarn && yarn install && yarn test

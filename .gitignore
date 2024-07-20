@@ -2,3 +2,14 @@
 /bin/
 .vscode/
 .DS_Store
+
+.github/workflows/ai-integration-workflow.yml
+.github/workflows/apiquery-integration-workflow.yml
+.github/workflows/brute-integration-workflow.yml
+.github/workflows/delivery.yml
+.github/workflows/dnsresolve-integration-workflow.yml
+.github/workflows/frontend-integration-workflow.yml
+.github/workflows/integration-integration-workflow.yml
+.github/workflows/pipeline.yml
+.github/workflows/portscan-integration-workflow.yml
+
