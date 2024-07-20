@@ -2,13 +2,13 @@ use tonic::Request;
 use brutesvc::brute;
 use tokio::sync::mpsc;
 use tonic::transport::Server;
-use brutesvc::subdomain::api::brute::v1::{brute_service_client::BruteServiceClient, brute_service_server::BruteServiceServer};
-use brutesvc::subdomain::api::brute::v1::BruteForceRequest;
+use brutesvc::subdomain::{brute_service_client::BruteServiceClient, brute_service_server::BruteServiceServer};
+use brutesvc::subdomain::BruteForceRequest;
 
 #[tokio::test]
 async fn test_brute_valid_target(){
 
-    let addr = "[::1]:3661".parse().unwrap();
+    let addr = "0.0.0.0:3661".parse().unwrap();
 
 
     let test_brute_svc_component = brute::BruteForceComponent::default();
@@ -40,7 +40,7 @@ async fn test_brute_valid_target(){
             target: "vmrw.com".to_string(),
             success: true,
             expected_code: tonic::Code::Ok,
-        }, 
+        },
         Data{
             target: "".to_string(),
             success: false,
