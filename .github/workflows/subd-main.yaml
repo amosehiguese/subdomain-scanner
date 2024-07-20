@@ -71,7 +71,10 @@ jobs:
       - name: Run Python test
         timeout-minutes: 10
         run: |
-          pushd src/aisvc
+          pushd src/aibrutesvc
+          python -m pip install --upgrade pip
+          pip install pytest
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           python -m pytest --verbose
           popd
 

@@ -68,7 +68,7 @@ The user initiates a POST request containing the target domain. Upon receiving t
 ### Steps in the `scan` Method:
 
 1. **Subdomain Discovery:**
-   - The arguments are passed to `apiQuerySvc`, `aiSvc`, and `bruteSvc`, which both return lists of subdomains. These lists are combined into a single result.
+   - The arguments are passed to `apiQuerySvc`, `aiBruteSvc`, and `bruteSvc`, which both return lists of subdomains. These lists are combined into a single result.
 
 2. **DNS Resolution:**
    - The combined subdomain list is passed to `dnsResolveSvc`, which resolves the subdomains into their corresponding DNS addresses and then streams the output to the `portScanSvc`.
@@ -86,7 +86,7 @@ The user initiates a POST request containing the target domain. Upon receiving t
 | [bruteservice](/src/brutesvc) | Rust           | Uses the brute force methodology of finding subdomains                       |
 | [dnsresolveservice](/src/dnsresolvesvc)             | Java       | Responsible for resolving domain names to its ip addresses |
 | [portscanservice](/src/portscansvc)               | Rust       | Responsible for scanning subdomains for open ports                                    |
-| [aiservice](/src/aisvc)             | Python           | Responsible for performing semantic understanding using embeddings generated from target domain analysis                                |
+| [aibruteservice](/src/aibrutesvc)             | Python           | Responsible for finding subdomains by brute force using semantic understanding from target domain                           |
 
 
 
