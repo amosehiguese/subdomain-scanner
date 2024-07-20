@@ -6,41 +6,37 @@ on:
 
 permissions:
   contents: read
+  pull-requests: read
 
 jobs:
   apiquery-integration:
     uses: ./.github/workflows/apiquery-integration-workflow.yml
     permissions:
       contents: read
-      pull-requests: read
       checks: write
   dnsresolve-integration:
     uses: ./.github/workflows/dnsresolve-integration-workflow.yml
     permissions:
       contents: read
-      pull-requests: read
       checks: write
   brute-integration:
     uses: ./.github/workflows/brute-integration-workflow.yml
     permissions:
       contents: read
-      pull-requests: read
+      pull-requests: write
       checks: write
   frontend-integration:
     uses: ./.github/workflows/frontend-integration-workflow.yml
     permissions:
       contents: read
-      pull-requests: read
       checks: write
   ai-integration:
     uses: ./.github/workflows/ai-integration-workflow.yml
     permissions:
       contents: read
-      pull-requests: read
       checks: write
   portscan-integration:
     uses: ./.github/workflows/portscan-integration-workflow.yml
     permissions:
       contents: read
-      pull-requests: read
       checks: write
