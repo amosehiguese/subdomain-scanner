@@ -15,12 +15,15 @@ env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
 
+permissions:
+  pull-requests: read
+
 jobs:
   integration:
     uses: ./.github/workflows/integration.yml
     permissions:
       contents: read
-      pull-requests: read
+      pull-requests: write
       checks: write
 
 
