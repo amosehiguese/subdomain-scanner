@@ -71,7 +71,7 @@ jobs:
       - name: Run Python test
         timeout-minutes: 10
         run: |
-          pushd src/aiservice
+          pushd src/aisvc
           python -m pytest --verbose
           popd
 
