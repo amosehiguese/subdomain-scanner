@@ -37,9 +37,22 @@ jobs:
       - name: Run Rust test
         timeout-minutes: 10
         run: |
-          pushd src/brutesvc
-          cargo test --all-features
-          popd
+          echo "Installing dependencies..."
+
+          sudo apt-get update
+          sudo apt-get install -y cmake clang unzip libsasl2-dev
+          wget https://github.com/protocolbuffers/protobuf/releases/download/v21.8/protoc-21.8-linux-x86_64.zip
+          unzip protoc*.zip
+          sudo mv bin/protoc /usr/local/bin
+          sudo mv include/google /usr/local/include
+
+
+          for SVC in "brutesvc" "portscansvc"; do
+            echo "testing $SVC"
+            pushd src/brutesvc
+            cargo test --all-features
+            popd
+          done
 
       - name: Run Go test
         timeout-minutes: 5
