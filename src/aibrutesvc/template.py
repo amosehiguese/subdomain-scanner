@@ -1,8 +1,8 @@
 import os
 from pathlib import Path
-import logging
+from logger import getJSONLogger
 
-logging.basicConfig(level=logging.INFO, format='[%(asctime)s]: %(message)s:')
+logging = getJSONLogger("aibrutesvc")
 
 list_of_files = [
     "src/__init__.py",
@@ -13,6 +13,7 @@ list_of_files = [
     "research/trails.ipynb",
     "app.py",
     "store_index.py",
+    "logger.py"
 ]
 
 for filepath in list_of_files:

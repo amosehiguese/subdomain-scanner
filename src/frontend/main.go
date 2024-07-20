@@ -54,7 +54,8 @@ type frontendServer struct {
 	otelCollectorAddr string
 	otelCollectorConn *grpc.ClientConn
 
-	// aiAssistantSvcAddr string
+	// aiBruteSvcAddr string
+	// aiBruteSvcConn *grpc.ClientConn
 }
 
 func main() {
@@ -96,13 +97,13 @@ func main() {
 	mustMapEnv(&svc.bruteForceSvcAddr, "BRUTE_FORCE_SERVICE_ADDR")
 	mustMapEnv(&svc.dnsResolveSvcAddr, "DNS_RESOLVE_SERVER_ADDR")
 	mustMapEnv(&svc.portScanSvcAddr, "PORT_SCAN_SERVICE_ADDR")
-	// mustMapEnv(&svc.cyberAssistantSvcAddr, "CYBER_ASSISTANT_SERVICE_ADDR")
+	// mustMapEnv(&svc.aiBruteSvcAddr, "AI_BRUTE_SERVICE_ADDR")
 
 	mustConnGRPC(ctx, &svc.apiQuerySvcConn, svc.apiQuerySvcAddr)
 	mustConnGRPC(ctx, &svc.bruteForceSvcConn, svc.bruteForceSvcAddr)
 	mustConnGRPC(ctx, &svc.dnsResolveSvcConn, svc.dnsResolveSvcAddr)
 	mustConnGRPC(ctx, &svc.portScanSvcConn, svc.portScanSvcAddr)
-	// mustConnGRPC(ctx, &svc.cyberAssistantSvcAddr, svc.cyberAssistantSvcAddr)
+	// mustConnGRPC(ctx, &svc.aiBruteSvcAddr, svc.aiBruteSvcAddr)
 
 	r := mux.NewRouter()
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
