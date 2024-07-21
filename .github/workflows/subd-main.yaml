@@ -76,7 +76,7 @@ jobs:
 
       - name: Run Python test
         timeout-minutes: 10
-        run: ./github/scripts/run_pytests.sh src/aibrutesvc
+        run: .github/scripts/run_pytests.sh src/aibrutesvc
 
       - name: Run Node test
         timeout-minutes: 10
