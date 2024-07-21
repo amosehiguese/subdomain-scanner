@@ -74,22 +74,9 @@ jobs:
           ./gradlew test
           popd
 
-      - name: Check for Py test files
-        id: check-test
-        run: bash .github/scripts/check_tests.sh src/aibrutesvc
-
       - name: Run Python test
-        if: steps.check-test.outcome == 'success'
         timeout-minutes: 10
-        run: |
-          pushd src/aibrutesvc
-
-          python -m pip install --upgrade pip
-          pip install pytest
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-
-          python -m pytest --verbose
-          popd
+        run: ./github/scripts/run_pytests.sh src/aibrutesvc
 
       - name: Run Node test
         timeout-minutes: 10
