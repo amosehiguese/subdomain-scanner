@@ -4,6 +4,12 @@ on:
     branches:
       - main
       - release/*
+
+  pull_request:
+    branches:
+      - main
+
+
 jobs:
   tests:
     runs-on: ubuntu-latest
@@ -50,7 +56,7 @@ jobs:
           for SVC in "brutesvc" "portscansvc"; do
             echo "testing $SVC"
             pushd src/brutesvc
-            cargo test --all-features
+            cargo test --all-features --junitfile=junit.xml
             popd
           done
 
@@ -58,28 +64,49 @@ jobs:
         timeout-minutes: 5
         run: |
           pushd src/frontend
-          go test
+          go test --junitfile=junit.xml
           popd
 
       - name: Run Java test
         timeout-minutes: 10
         run: |
           pushd src/dnsresolvesvc
-          ./gradlew test
+          ./gradlew test --junitfile=junit.xml
           popd
 
       - name: Run Python test
+        if: steps.check-tests.outcome == 'success'
         timeout-minutes: 10
         run: |
           pushd src/aibrutesvc
+
+          if ls tests/test_*.py 1> /dev/null 2>&1; then
+            echo "Test found"
+            exit 0
+          else
+            echo "No tests found"
+            exit 1
+          fi
+
           python -m pip install --upgrade pip
           pip install pytest
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-          python -m pytest --verbose
+
+          python -m pytest --verbose --junitfile=junit.xml
           popd
 
       - name: Run Node test
         timeout-minutes: 10
         run: |
           pushd src/apiquerysvc
-          npm i -g yarn && yarn install && yarn test
+          npm i -g yarn && yarn install && yarn test --junitfile=junit.xml
+
+
+      - name: Publish Test Report
+        uses: mikepenz/action-junit-report@v3
+        if: success() || failure()
+        with:
+          report_paths: '**/junit.xml'
+          detailed_summary: true
+          include_passed: true
+

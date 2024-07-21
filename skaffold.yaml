@@ -8,10 +8,20 @@ build:
       context: src/apiquerysvc
     - image: brutesvc
       context: src/brutesvc
+      docker:
+        buildArgs:
+          MOLD_ARCH: "{{.MOLD_ARCH}}"
+          PROTO_ARCH: "{{.PROTO_ARCH}}"
+          GRPC_HEALTH_PROBE_ARCH: "{{.GRPC_HEALTH_PROBE_ARCH}}"
     - image: dnsresolvesvc
       context: src/dnsresolvesvc
     - image: portscansvc
       context: src/portscansvc
+      docker:
+        buildArgs:
+          MOLD_ARCH: "{{.MOLD_ARCH}}"
+          PROTO_ARCH: "{{.PROTO_ARCH}}"
+          GRPC_HEALTH_PROBE_ARCH: "{{.GRPC_HEALTH_PROBE_ARCH}}"
     - image: frontend
       context: src/frontend
   tagPolicy:

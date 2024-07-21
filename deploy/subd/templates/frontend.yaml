@@ -76,6 +76,23 @@ spec:
   - name: http
     port: 80
     targetPort: {{ .Values.frontend.port }}
+
+{{- if .Values.frontend.external }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.frontend.name }}-external
+  namespace: {{ .Release.Namespace }}
+spec:
+  type: LoadBalancer
+  selector:
+    app: {{ .Values.frontend.name }}
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+{{- end }}
 {{- if .Values.networkPolicies.create }}
 ---
 apiVersion: networking.k8s.io/v1

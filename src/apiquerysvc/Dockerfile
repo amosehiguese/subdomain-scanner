@@ -9,5 +9,5 @@ FROM base
 WORKDIR /usr/src/app
 COPY --from=builder /usr/src/app/node_modules ./node_modules
 COPY . .
-EXPOSE 7000
+EXPOSE 50051
 ENTRYPOINT [ "yarn", "run", "server" ]

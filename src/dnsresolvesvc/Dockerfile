@@ -14,5 +14,5 @@ RUN apk add --no-cache ca-certificates
 WORKDIR /app
 COPY --from=builder /app .
 
-EXPOSE 6856
+EXPOSE 50053
 ENTRYPOINT [ "/app/build/install/dnsresolvesvc/bin/dns-resolve-service" ]

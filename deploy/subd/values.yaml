@@ -51,6 +51,7 @@ frontend:
   name: frontend
   port: 8080
   enableTracing: "0"
+  external: false
   resources:
     requests:
       cpu: 100m

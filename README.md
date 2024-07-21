@@ -86,7 +86,7 @@ The user initiates a POST request containing the target domain. Upon receiving t
 | [bruteservice](/src/brutesvc) | Rust           | Uses the brute force methodology of finding subdomains                       |
 | [dnsresolveservice](/src/dnsresolvesvc)             | Java       | Responsible for resolving domain names to its ip addresses |
 | [portscanservice](/src/portscansvc)               | Rust       | Responsible for scanning subdomains for open ports                                    |
-| [aibruteservice](/src/aibrutesvc)             | Python           | Responsible for finding subdomains by brute force using semantic understanding from target domain                           |
+| [aibruteservice](/src/aibrutesvc)             | Python           | Leverages Gen AI for finding subdomains by brute force using semantic understanding from target domain                           |
 
 
 
