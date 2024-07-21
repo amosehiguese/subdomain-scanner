@@ -74,18 +74,15 @@ jobs:
           ./gradlew test
           popd
 
+      - name: Check for Py test files
+        id: check-test
+        run: bash .github/scripts/check_tests.sh src/aibrutesvc
+
       - name: Run Python test
+        if: steps.check-test.outcome == 'success'
         timeout-minutes: 10
         run: |
           pushd src/aibrutesvc
-
-          if ls tests/test_*.py 1> /dev/null 2>&1; then
-            echo "Test found"
-            exit 0
-          else
-            echo "No tests found"
-            exit 1
-          fi
 
           python -m pip install --upgrade pip
           pip install pytest
@@ -99,13 +96,4 @@ jobs:
         run: |
           pushd src/apiquerysvc
           npm i -g yarn && yarn install && yarn test
-
-
-      - name: Publish Test Report
-        uses: mikepenz/action-junit-report@v4
-        if: success() || failure()
-        with:
-          report_paths: '**/build/test-results/test/TEST-*.xml'
-          detailed_summary: true
-          include_passed: true
 
