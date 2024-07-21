@@ -7,7 +7,7 @@
     "build": "sh ./genproto.sh && tsc --build",
     "server": "ts-node server.ts",
     "client": "ts-node client.ts",
-    "test": "mocha -r ts-node/register test/**.spec*.ts"
+    "test": "mocha -r ts-node/register test/**.spec*.ts  --exit"
   },
   "author": "",
   "license": "ISC",
