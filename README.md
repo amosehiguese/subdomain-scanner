@@ -71,10 +71,10 @@ The user initiates a POST request containing the target domain. Upon receiving t
    - The arguments are passed to `apiQuerySvc`, `aiBruteSvc`, and `bruteSvc`, which both return lists of subdomains. These lists are combined into a single result.
 
 2. **DNS Resolution:**
-   - The combined subdomain list is passed to `dnsResolveSvc`, which resolves the subdomains into their corresponding DNS addresses and then streams the output to the `portScanSvc`.
+   - The combined subdomain list is passed to `dnsResolveSvc`, which resolves the subdomains into their corresponding DNS addresse.
 
 3. **Port Scanning:**
-   - Here each subdomain are scanned for open ports and streamed back to the `dnsResolveSvc`.
+   - Here each subdomain are scanned for open ports.
 
 4. **Response Construction:**
    - The final list, including subdomains and their open ports, is sent back as a response to the `frontend`.
