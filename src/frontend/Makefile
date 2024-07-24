@@ -1,6 +1,7 @@
 .PHONY: test
 test:
-  go test -v ./...
+	go test ./...
+
 .PHONY: build
 build:
 	go build -o bin/frontend

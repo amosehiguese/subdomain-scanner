@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"io"
 	"net/http"
 
 	pb "github.com/amosehiguese/subdomain-scanner/src/frontend/genproto/subdomain"
@@ -36,44 +35,20 @@ func (fe *frontendServer) resolveDNS(ctx context.Context, hosts []string) ([]str
 }
 
 func (fe *frontendServer) portScan(ctx context.Context, hosts []string) ([]Subdomain, error) {
-	stream, err := pb.NewPortScanServiceClient(fe.portScanSvcConn).ScanForOpenPorts(ctx)
+	resp, err := pb.NewPortScanServiceClient(fe.portScanSvcConn).ScanForOpenPorts(ctx, &pb.PortScanRequest{Hosts: hosts})
 	if err != nil {
 		return nil, err
 	}
 
-	result := make(chan *pb.Subdomain, 200)
-
-	go func() {
-		for {
-			in, err := stream.Recv()
-			if err == io.EOF {
-				close(result)
-				return
-			}
-			if err != nil {
-				return
-			}
-			result <- in
-		}
-	}()
-
-	for _, host := range hosts {
-		if err := stream.Send(&pb.PortScanRequest{Host: host}); err != nil {
-			return nil, err
-		}
-	}
-	stream.CloseSend()
-
 	var subdomains []Subdomain
-	for subdomain := range result {
+	for _, s := range resp.Subdomains {
 		subd := Subdomain{
-			Domain: subdomain.Domain,
-			Ports:  subdomain.Ports,
+			Domain: s.Domain,
+			Ports:  s.Ports,
 		}
 
 		subdomains = append(subdomains, subd)
 	}
-
 	return subdomains, nil
 }
 
@@ -117,8 +92,7 @@ func (fe *frontendServer) scan(r *http.Request, domain string) ([]Subdomain, err
 		return nil, err
 	}
 
-	var subds []Subdomain
-	subds, err = fe.portScan(ctx, result)
+	subds, err := fe.portScan(ctx, result)
 	if err != nil {
 		zapLog.With(
 			zap.Field(

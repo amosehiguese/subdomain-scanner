@@ -15,6 +15,11 @@ import io.opentelemetry.instrumentation.grpc.v1_6.GrpcTelemetry;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
+import java.util.concurrent.Executors;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -31,6 +36,7 @@ import org.apache.logging.log4j.Logger;
 
 public class DnsResolveService {
     private static final Logger logger = LogManager.getLogger(DnsResolveService.class);
+    private static final int THREAD_POOL_SIZE = 100;
 
     private Server server;
     private HealthStatusManager healthMgr;
@@ -91,19 +97,29 @@ public class DnsResolveService {
         @Override
         public void resolveDns(ResolveDnsRequest request, StreamObserver<ResolveDnsResponse> responseObserver) {
             logger.info("received " + request.getHostsCount() + " new dns to resolve");
+            ExecutorService executor = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
             try {
-                List<String> result = new ArrayList<>();
-                for (String host: request.getHostsList()){
-                    if (resolves(host)) {
-                        result.add(host);
-                    }
-                }
-                ResolveDnsResponse resp = ResolveDnsResponse.newBuilder().addAllSubdomain(result).build();
+                List<String> subdomains = request.getHostsList();
+
+                // Fan-out: Distribute tasks across multiple threads
+                List<CompletableFuture<String>> futures = subdomains.stream()
+                .map(subdomain -> CompletableFuture.supplyAsync(() -> resolves(subdomain) ? subdomain : null, executor))
+                .collect(Collectors.toList());
+
+                // Fan-in: Collect results from all threads
+                List<String> resolvedSubdomains = futures.stream()
+                .map(CompletableFuture::join)  // Wait for each future to complete and get the result
+                .filter(subdomain -> subdomain != null) // Filter out unresolved subdomains
+                .collect(Collectors.toList());
+
+                ResolveDnsResponse resp = ResolveDnsResponse.newBuilder().addAllSubdomain(resolvedSubdomains).build();
                 responseObserver.onNext(resp);
                 responseObserver.onCompleted();
             } catch (StatusRuntimeException e) {
                 logger.log(Level.WARN, "Failed with status {}", e.getStatus());
                 responseObserver.onError(e);
+            } finally {
+                executor.shutdown();
             }
         }
 

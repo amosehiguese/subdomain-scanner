@@ -11,9 +11,9 @@ FROM chef AS builder
 ARG MOLD_VERSION=1.11.0
 ARG PROTO_VERSION=21.8
 
-ARG MOLD_ARCH
-ARG PROTO_ARCH
-ARG GRPC_HEALTH_PROBE_ARCH
+ARG MOLD_ARCH=x86_64
+ARG PROTO_ARCH=x86_64
+ARG GRPC_HEALTH_PROBE_ARCH=amd64
 
 RUN test -n "$MOLD_ARCH" || (echo "MOLD_ARCH not set" && false)
 RUN test -n "$PROTO_ARCH" || (echo "PROTO_ARCH not set" && false)
@@ -51,13 +51,13 @@ COPY --from=planner /opt/src/recipe.json recipe.json
 
 RUN cargo chef cook --release --recipe-path recipe.json
 COPY . .
-RUN cargo build --release -p brutesvc --bin brutesvc
+RUN cargo build --release
 
 FROM debian:stable-slim
 RUN apt-get update && \
     apt-get install --no-install-recommends -y ca-certificates libssl3 libsasl2-2 libpq5 && \
     rm -rf /var/lib/apt/lists/*
-COPY --from=builder /opt/src/target/release/brutesvc /usr/local/bin/brutesvc
+COPY --from=builder /opt/src/target/release/brute-server /usr/local/bin/brute-server
 COPY --from=builder /bin/grpc_health_probe /bin/grpc_health_probe
 
 RUN groupadd --system md --gid 151 \
@@ -67,4 +67,4 @@ USER md
 
 EXPOSE 50052
 
-CMD ["brutesvc"]
+CMD ["brute-server"]

@@ -49,11 +49,15 @@ message ResolveDnsResponse {
 // -----------------Port Scan service-----------------
 
 service PortScanService {
-    rpc ScanForOpenPorts(stream PortScanRequest) returns (stream Subdomain) {};
+    rpc ScanForOpenPorts(PortScanRequest) returns (PortScanResponse) {};
 }
 
 message PortScanRequest {
-    string host = 1;
+  repeated string hosts = 1;
+}
+
+message PortScanResponse {
+  repeated Subdomain subdomains = 1;
 }
 
 message Subdomain {
