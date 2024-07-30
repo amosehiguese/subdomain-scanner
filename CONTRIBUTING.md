@@ -10,10 +10,8 @@ This doc explains how to build and run the Subdomain Scanner source code locally
 
 - [Docker for Desktop](https://www.docker.com/products/docker-desktop) for windows
 - [Docker Engine](https://docs.docker.com/engine/install/) for linux
-- [Minikube](https://minikube.sigs.k8s.io/docs/start/) (optional Local Cluster 1)
 - [Kind](https://kind.sigs.k8s.io/) (optional Local Cluster 2)
 - [kubectl](https://kubernetes.io/docs/tasks/tools/)
-- [skaffold **2.12.0**](https://skaffold.dev/docs/install/) (latest version recommended), a tool that builds and deploys Docker images in bulk.
 - Clone the repository.
   ```sh
   git clone https://github.com/amosehiguese/subdomain-scanner.git
@@ -22,45 +20,23 @@ This doc explains how to build and run the Subdomain Scanner source code locally
 
 ## Run on a Local Cluster
 
-1. Launch a local Kubernetes cluster with one of the following tools:
+1. Launch the appliction
+  ```
+    chmod +x ./scripts/run.sh
+    ./scripts/run.sh
 
-   - To launch **Minikube** (tested with Ubuntu Linux). Please, ensure that the
-     local Kubernetes cluster has at least:
+  ```
+2. Run `kubectl get pods` to verify the Pods are ready and running.
 
-     - 4 CPUs
-     - 4.0 GiB memory
-     - 32 GB disk space
+3. Run `kubectl port-forward pod/<Pod_name> 8080:8080` to forward a port to the frontend.
 
-     ```shell
-     minikube start --cpus=4 --memory 4096 --disk-size 32g
-     ```
-
-   - To launch **Docker for Desktop** (tested with Mac/Windows). Go to Preferences:
-
-     - choose “Enable Kubernetes”,
-     - set CPUs to at least 3, and Memory to at least 6.0 GiB
-     - on the "Disk" tab, set at least 32 GB disk space
-
-   - To launch a **Kind** cluster:
-
-     ```shell
-     kind create cluster
-     ```
-
-2. Run `kubectl get nodes` to verify you're connected to the respective control plane.
-
-3. Run `skaffold run` (first time will be slow, it can take ~20 minutes).
-   This will build and deploy the application. If you need to rebuild the images
-   automatically as you refactor the code, run `skaffold dev` command.
-
-4. Run `kubectl get pods` to verify the Pods are ready and running.
-
-5. Run `kubectl port-forward pod/<Pod_name> 8080:8080` to forward a port to the frontend.
-
-6. Navigate to `localhost:8080` to access the web frontend.
+4. Navigate to `localhost:8080` to access the web frontend.
 
 ## Cleanup
 
-If you've deployed the application with `skaffold run` command, you can run
+To clean up the deployed resources. Run
 
-`skaffold delete` to clean up the deployed resources.
+```
+chmod +x ./scripts/clean.sh
+./scripts/clean.sh
+```
