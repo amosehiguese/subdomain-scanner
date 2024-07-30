@@ -2,9 +2,10 @@ use crate::consts;
 use tracing_log::log;
 use tokio::{net::TcpStream, sync::mpsc};
 use futures::stream::StreamExt;
-use tonic::{Request, Response, Status};
-use std::{net::{ToSocketAddrs, SocketAddr}};
-use crate::subdomain::{port_scan_service_server::PortScanService, Subdomain, Port, PortScanRequest, PortScanResponse};
+use tokio_stream::Stream;
+use tonic::{Request, Response, Status, Streaming};
+use std::{net::{ToSocketAddrs, SocketAddr}, pin::Pin};
+use crate::subdomain::{port_scan_service_server::PortScanService, Subdomain, Port, PortScanRequest};
 
 
 #[derive(Debug, Default)]
@@ -12,73 +13,68 @@ pub struct PortScanComponent {}
 
 #[tonic::async_trait]
 impl PortScanService for PortScanComponent {
+    type ScanForOpenPortsStream = Pin<Box<dyn Stream<Item = Result<Subdomain, Status>> + Send + 'static>>;
 
     async fn scan_for_open_ports(
         &self,
-        request: Request<PortScanRequest>,
-    )-> Result<Response<PortScanResponse>, Status> {
+        request: Request<Streaming<PortScanRequest>>,
+    )-> Result<Response<Self::ScanForOpenPortsStream>, Status>{
         log::info!("Scanning for open ports...");
 
         let buffer = 100000;
-        let req = request.into_inner();
-        let mut output: Vec<Subdomain> = Vec::new();
+        let mut stream = request.into_inner();
+        let output = async_stream::try_stream!{
+            while let Some(req) = stream.next().await {
+                let req = req.unwrap();
+                let address = format!("{}:1024", req.host)
+                    .to_socket_addrs()
+                    .unwrap()
+                    .next();
 
-        for subdomain in req.hosts.iter() {
-            let address = format!("{}:1024", subdomain)
-                .to_socket_addrs()
-                .ok()
-                .and_then(|mut addrs| addrs.next());
-
-            if address.is_none() {
-                let subd = Subdomain { domain: subdomain.to_string(), ports: vec![] };
-                output.push(subd);
-                continue
-            }
-
-            let address = address.unwrap();
-
-            let (input_tx, input_rx) = mpsc::channel::<u32>(buffer);
-            let (output_tx, output_rx) = mpsc::channel::<Port>(buffer);
-
-            tokio::spawn(async move{
-                for port in consts::PORTS_LIST{
-                    let _ = input_tx.send(*port).await;
+                if let None = address {
+                    yield Subdomain { domain: req.host.clone(), ports: vec![] };
+                    continue
                 }
-                drop(input_tx);
-            });
 
-            let input_receiver_stream = tokio_stream::wrappers::ReceiverStream::new(input_rx);
+                let (input_tx, input_rx) = mpsc::channel::<u32>(buffer);
+                let (output_tx, output_rx) = mpsc::channel::<Port>(buffer);
 
-            input_receiver_stream
-                .for_each_concurrent(buffer, |port| {
-                    let output_tx = output_tx.clone();
-                    let address = address.clone();
+                tokio::spawn(async move {
+                    for port in consts::PORTS_LIST{
+                        let _ = input_tx.send(*port).await;
 
-                    async move {
-                        let port: Port = scan_port(address, port).await;
-                        if port.conn_open {
-                            let _ = output_tx.send(port).await;
-                        }
                     }
-                })
-                .await;
-            drop(output_tx);
+                    drop(input_tx);
+                });
 
-            let output_receiver_stream = tokio_stream::wrappers::ReceiverStream::new(output_rx);
-            let ports: Vec<Port> = output_receiver_stream.collect().await;
+                let input_receiver_stream = tokio_stream::wrappers::ReceiverStream::new(input_rx);
+                input_receiver_stream
+                    .for_each_concurrent(buffer, |port| {
+                        let output_tx = output_tx.clone();
 
-            log::info!("scan completed for {:?}", subdomain);
-            let subd = Subdomain { domain: subdomain.to_string(), ports: ports};
+                        async move {
+                            let port: Port = scan_port(address.unwrap(), port).await;
+                            if port.conn_open {
+                                let _ = output_tx.send(port).await;
+                            }
+                        }
+                    })
+                    .await;
+                drop(output_tx);
 
-            output.push(subd);
-        }
+                let output_receiver_stream = tokio_stream::wrappers::ReceiverStream::new(output_rx);
 
-        Ok(Response::new(PortScanResponse{subdomains: output}))
+                log::info!("scan completed for {:?}", req.host.clone());
+                yield Subdomain { domain: req.host.clone(), ports: output_receiver_stream.collect::<Vec<Port>>().await };
+            }
+        };
+
+        Ok(Response::new(Box::pin(output) as Self::ScanForOpenPortsStream))
     }
 }
 
 async fn scan_port(mut addr: SocketAddr, port: u32) -> Port {
-    let timeout = tokio::time::Duration::from_millis(500);
+    let timeout = tokio::time::Duration::from_millis(800);
     let mut is_open = false;
 
     addr.set_port(port as u16);

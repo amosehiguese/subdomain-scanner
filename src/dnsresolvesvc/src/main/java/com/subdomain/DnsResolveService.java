@@ -2,10 +2,12 @@ package com.subdomain;
 
 import io.grpc.BindableService;
 import io.grpc.Server;
+import io.grpc.Grpc;
 import io.grpc.ServerBuilder;
 import io.grpc.ServerInterceptors;
 import io.grpc.ServerServiceDefinition;
 import io.grpc.StatusRuntimeException;
+import io.grpc.InsecureServerCredentials;
 import io.grpc.health.v1.HealthCheckResponse.ServingStatus;
 import io.grpc.protobuf.services.HealthStatusManager;
 import io.grpc.stub.StreamObserver;
@@ -40,8 +42,7 @@ public class DnsResolveService {
 
     private Server server;
     private HealthStatusManager healthMgr;
-
-    private static OpenTelemetry otel;
+    private static final OpenTelemetry otel = initTracing();
 
     private static final DnsResolveService service = new DnsResolveService();
 
@@ -50,9 +51,9 @@ public class DnsResolveService {
         healthMgr = new HealthStatusManager();
 
         server =
-            ServerBuilder.forPort(port)
+            Grpc.newServerBuilderForPort(port, InsecureServerCredentials.create())
             // .addService(configureServerInterceptor(otel, getResolveServiceImpl()))
-            .addService(new DnsResolveServiceImpl())
+            .addService(getResolveServiceImpl())
             .addService(healthMgr.getHealthService())
             .build()
             .start();
@@ -146,28 +147,26 @@ public class DnsResolveService {
         }
     }
 
-    private static void initTracing() {
-        String tracing_enabled = System.getenv("tracing_enabled");
-        if (tracing_enabled != null && tracing_enabled == "true") {
-            String endpoint = System.getenv("OTEL_ENDPOINT");
-            otel = Telemetry.initOpenTelemetry(endpoint);
+    private static OpenTelemetry initTracing() {
+        String tracing_enabled = System.getenv("TRACING_ENABLED");
+        if (tracing_enabled != null && tracing_enabled == "1") {
+            String endpoint = System.getenv("OTEL_COLLECTOR_ADDR");
+            if (endpoint == null) {
+                endpoint = "http://jaeger-otel.jaeger.svc.cluster.local:14278/api/traces";
+            }
+            OpenTelemetry otele = Telemetry.initOpenTelemetry(endpoint);
             logger.info("Tracing enabled");
-            return;
+            return otele;
         }
         logger.info("Tracing disabled");
+        return null;
     }
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        new Thread(
-            () -> {
-                initTracing();
-            }
-        )
-        .start();
-
         // Start the RPC Server
         logger.info("DnsResolve Service starting...");
         final DnsResolveService service = DnsResolveService.getInstance();
+
         service.start();
         service.blockUntilShutdown();
     }

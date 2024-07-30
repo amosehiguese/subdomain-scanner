@@ -11,7 +11,7 @@ export const initTracing = () => {
         }),
     });
 
-    const otelEndpoint = process.env.OTEL_ENDPOINT;
+    const otelEndpoint = process.env.OTEL_COLLECTOR_ADDR || "http://jaeger-otel.jaeger.svc.cluster.local:14278/api/traces";
 
     provider.addSpanProcessor(new SimpleSpanProcessor(new OTLPTraceExporter({url: otelEndpoint})));
     provider.reqister();

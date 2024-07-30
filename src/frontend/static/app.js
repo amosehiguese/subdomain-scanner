@@ -16,7 +16,7 @@ function handleSubmit() {
         renderError()
         return
     }
-    
+
     const resultsSection = document.getElementById('results-section');
 
     // Create a header to display a 'scanning' message
@@ -45,7 +45,7 @@ function exportJson(rawData) {
     console.log("Exporting...");
     console.log("Raw json: ", rawData);
 
-    const jsonString = "data:text/json;charset=utf-8," + 
+    const jsonString = "data:text/json;charset=utf-8," +
         encodeURIComponent(JSON.stringify(rawData));
 
     const download = document.createElement('a');
@@ -96,7 +96,7 @@ function renderResults(query, results) {
     exportButton.setAttribute('id', 'export-results');
     exportButtonDiv.appendChild(exportButton);
     exportButton.innerHTML = '<span class="export-text">Export Results</span><span class="fa-solid fa-download"></span>'
-    
+
     exportButton.addEventListener('click', function() {
         console.log("exporting json...");
         exportJson(results);
@@ -131,7 +131,7 @@ function renderResults(query, results) {
         let portsContainer = document.createElement('div');
         portsContainer.classList.add("ports-container");
         newResult.appendChild(portsContainer);
-        
+
         let openPorts = result["open_ports"];
         console.log("openPorts: ", openPorts);
 
@@ -152,7 +152,7 @@ function renderResults(query, results) {
                 openStatusDiv.innerHTML = `<i class="fa-solid fa-circle open-port"></i>`;
             } else {
                 openStatusDiv.innerHTML = `<i class="fa-solid fa-circle closed-port"></i>`;
-            }        
+            }
 
             port.appendChild(portNumberDiv);
             port.appendChild(openStatusDiv);
@@ -165,12 +165,10 @@ function renderResults(query, results) {
 
 
 
-function renderError() {
-    const resultsSection = document.getElementById('results-section');
-    resultsSection.innerHTML = `<h3 style="color: red;">Please enter a valid domain</h3>`;
+function renderError(query) {
     setTimeout(()=>{
-        resetResults()
-    },3000)
+        renderNotFound(query)
+    },5000)
 }
 function apiCall(query, url, method) {
     let xhr = new XMLHttpRequest();
@@ -179,10 +177,9 @@ function apiCall(query, url, method) {
         if (this.readyState === this.DONE) {
             if (xhr.status >= 200 && xhr.status < 300) {
                 const results = JSON.parse(this.responseText)["subdomains"];
-                console.log("subdomains: ", results);
                 renderResults(query, results);
             } else{
-                renderError()
+                renderError(query)
             }
         }
     });

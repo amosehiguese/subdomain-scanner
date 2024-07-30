@@ -6,10 +6,10 @@ static CONFIG: sync::OnceLock<Config> = sync::OnceLock::new();
 
 #[derive(Envconfig, Debug, Clone)]
 pub struct TelemetryConfig {
-    #[envconfig(from = "OTEL-TRACING-ENABLED", default = "false")]
-    pub otel_tracing_enabled: bool,
+    #[envconfig(from = "TRACING_ENABLED", default = "0")]
+    pub otel_tracing_enabled: String,
 
-    #[envconfig(from = "OTEL_ENDPOINT", default = "http://0.0.0.0:4317")]
+    #[envconfig(from = "OTEL_COLLECTOR_ADDR", default = "http://jaeger-otel.jaeger.svc.cluster.local:14278/api/traces")]
     pub otel_endpoint: String,
 }
 

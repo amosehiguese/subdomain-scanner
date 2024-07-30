@@ -4,7 +4,7 @@ use tracing_log::log;
 use tracing_subscriber::{layer::SubscriberExt, registry::LookupSpan, util::SubscriberInitExt, EnvFilter, filter::LevelFilter};
 
 pub fn init_telemetry(config: &TelemetryConfig) {
-    if config.otel_tracing_enabled {
+    if config.otel_tracing_enabled == "1" {
         init_telemetry_tracing(config);
         log::info!("Tracing is enabled");
     } else {
@@ -25,7 +25,7 @@ pub fn init_regular_logging() {
 }
 
 
-fn init_telemetry_tracing(config: &TelemetryConfig){ 
+fn init_telemetry_tracing(config: &TelemetryConfig){
     std::env::set_var("OTEL_EXPORTER_OTLP_ENDPOINT", config.otel_endpoint.clone());
     std::env::set_var("OTEL_EXPORTER_OTLP_TRACES_PROTOCOL", "grpc");
 

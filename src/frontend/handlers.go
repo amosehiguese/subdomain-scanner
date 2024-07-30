@@ -38,6 +38,8 @@ func (fe *frontendServer) scanHandler(w http.ResponseWriter, r *http.Request) {
 		zapLog.With(
 			zap.Error(err),
 		).Error("internal server error")
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(map[string]any{
 			"status": "failed",
 			"msg":    "internal server error",

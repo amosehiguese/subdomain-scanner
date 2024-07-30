@@ -280,7 +280,7 @@ var ResolveDnsService_ServiceDesc = grpc.ServiceDesc{
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type PortScanServiceClient interface {
-	ScanForOpenPorts(ctx context.Context, in *PortScanRequest, opts ...grpc.CallOption) (*PortScanResponse, error)
+	ScanForOpenPorts(ctx context.Context, opts ...grpc.CallOption) (PortScanService_ScanForOpenPortsClient, error)
 }
 
 type portScanServiceClient struct {
@@ -291,20 +291,42 @@ func NewPortScanServiceClient(cc grpc.ClientConnInterface) PortScanServiceClient
 	return &portScanServiceClient{cc}
 }
 
-func (c *portScanServiceClient) ScanForOpenPorts(ctx context.Context, in *PortScanRequest, opts ...grpc.CallOption) (*PortScanResponse, error) {
-	out := new(PortScanResponse)
-	err := c.cc.Invoke(ctx, "/subdomain.PortScanService/ScanForOpenPorts", in, out, opts...)
+func (c *portScanServiceClient) ScanForOpenPorts(ctx context.Context, opts ...grpc.CallOption) (PortScanService_ScanForOpenPortsClient, error) {
+	stream, err := c.cc.NewStream(ctx, &PortScanService_ServiceDesc.Streams[0], "/subdomain.PortScanService/ScanForOpenPorts", opts...)
 	if err != nil {
 		return nil, err
 	}
-	return out, nil
+	x := &portScanServiceScanForOpenPortsClient{stream}
+	return x, nil
+}
+
+type PortScanService_ScanForOpenPortsClient interface {
+	Send(*PortScanRequest) error
+	Recv() (*Subdomain, error)
+	grpc.ClientStream
+}
+
+type portScanServiceScanForOpenPortsClient struct {
+	grpc.ClientStream
+}
+
+func (x *portScanServiceScanForOpenPortsClient) Send(m *PortScanRequest) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *portScanServiceScanForOpenPortsClient) Recv() (*Subdomain, error) {
+	m := new(Subdomain)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
 }
 
 // PortScanServiceServer is the server API for PortScanService service.
 // All implementations must embed UnimplementedPortScanServiceServer
 // for forward compatibility
 type PortScanServiceServer interface {
-	ScanForOpenPorts(context.Context, *PortScanRequest) (*PortScanResponse, error)
+	ScanForOpenPorts(PortScanService_ScanForOpenPortsServer) error
 	mustEmbedUnimplementedPortScanServiceServer()
 }
 
@@ -312,8 +334,8 @@ type PortScanServiceServer interface {
 type UnimplementedPortScanServiceServer struct {
 }
 
-func (UnimplementedPortScanServiceServer) ScanForOpenPorts(context.Context, *PortScanRequest) (*PortScanResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ScanForOpenPorts not implemented")
+func (UnimplementedPortScanServiceServer) ScanForOpenPorts(PortScanService_ScanForOpenPortsServer) error {
+	return status.Errorf(codes.Unimplemented, "method ScanForOpenPorts not implemented")
 }
 func (UnimplementedPortScanServiceServer) mustEmbedUnimplementedPortScanServiceServer() {}
 
@@ -328,22 +350,30 @@ func RegisterPortScanServiceServer(s grpc.ServiceRegistrar, srv PortScanServiceS
 	s.RegisterService(&PortScanService_ServiceDesc, srv)
 }
 
-func _PortScanService_ScanForOpenPorts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PortScanRequest)
-	if err := dec(in); err != nil {
+func _PortScanService_ScanForOpenPorts_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(PortScanServiceServer).ScanForOpenPorts(&portScanServiceScanForOpenPortsServer{stream})
+}
+
+type PortScanService_ScanForOpenPortsServer interface {
+	Send(*Subdomain) error
+	Recv() (*PortScanRequest, error)
+	grpc.ServerStream
+}
+
+type portScanServiceScanForOpenPortsServer struct {
+	grpc.ServerStream
+}
+
+func (x *portScanServiceScanForOpenPortsServer) Send(m *Subdomain) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *portScanServiceScanForOpenPortsServer) Recv() (*PortScanRequest, error) {
+	m := new(PortScanRequest)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
-	if interceptor == nil {
-		return srv.(PortScanServiceServer).ScanForOpenPorts(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/subdomain.PortScanService/ScanForOpenPorts",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PortScanServiceServer).ScanForOpenPorts(ctx, req.(*PortScanRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+	return m, nil
 }
 
 // PortScanService_ServiceDesc is the grpc.ServiceDesc for PortScanService service.
@@ -352,12 +382,14 @@ func _PortScanService_ScanForOpenPorts_Handler(srv interface{}, ctx context.Cont
 var PortScanService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "subdomain.PortScanService",
 	HandlerType: (*PortScanServiceServer)(nil),
-	Methods: []grpc.MethodDesc{
+	Methods:     []grpc.MethodDesc{},
+	Streams: []grpc.StreamDesc{
 		{
-			MethodName: "ScanForOpenPorts",
-			Handler:    _PortScanService_ScanForOpenPorts_Handler,
+			StreamName:    "ScanForOpenPorts",
+			Handler:       _PortScanService_ScanForOpenPorts_Handler,
+			ServerStreams: true,
+			ClientStreams: true,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
 	Metadata: "subdomain.proto",
 }

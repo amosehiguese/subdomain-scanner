@@ -3,15 +3,11 @@ syntax = "proto3";
 package subdomain;
 
 service PortScanService {
-    rpc ScanForOpenPorts(PortScanRequest) returns (PortScanResponse) {};
+    rpc ScanForOpenPorts(stream PortScanRequest) returns (stream Subdomain) {};
 }
 
 message PortScanRequest {
-  repeated string hosts = 1;
-}
-
-message PortScanResponse {
-  repeated Subdomain subdomains = 1;
+  string host = 1;
 }
 
 message Subdomain {

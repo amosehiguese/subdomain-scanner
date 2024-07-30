@@ -22,7 +22,7 @@ registerInstrumentations({
 
 const {initTracing} = require('./telemetry');
 
-if (process.env.ENABLE_TRACING == "1") {
+if (process.env.TRACING_ENABLED == "1") {
     logger.info("Tracing enabled.")
     initTracing();
 } else {
