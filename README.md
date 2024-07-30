@@ -89,6 +89,9 @@ The user initiates a POST request containing the target domain. Upon receiving t
 | [aibruteservice](/src/aibrutesvc)             | Python           | Leverages Gen AI for finding subdomains by brute force using semantic understanding from target domain                           |
 
 
+</br>
+</br>
+
 | Technologies                                           | Uses
 | ----------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------
 | Kubernetes                         | Container Orchestration System for managing containers
@@ -104,12 +107,9 @@ The user initiates a POST request containing the target domain. Upon receiving t
 | Fluent Bit                         | A log and metrics processor which serves as a cluster-level log collector agent.
 | Elastic Search                         | A logging backend.
 | Kibana                         | A data visualization dashboard for Elastic-search.
-| AWS CDK                        | Used for AWS Infra Stack provisioning.
-|
+| AWS CDK                        | Used for AWS Infra Stack provisioning
 
-
-
-
+</br>
 
 ## License
 
@@ -117,13 +117,15 @@ Copyright 2024 Subdomain Enumeration Tool
 
 Licensed under the Apache License. <br/> See [LICENSE.md](LICENSE) for more information.
 
+</br>
+
 ## Contributors ✨
 
 <a href="https://github.com/remarkablemark">
   <img src="https://avatars.githubusercontent.com/u/93928881?s=50&u=b468eec8d146b8a918bcae959e3ee7b74ba336c2&v=4&mask=circle">
 </a>
 
-
+</br>
 
 ## Star History
 
