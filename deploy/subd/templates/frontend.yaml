@@ -49,6 +49,7 @@ spec:
           values: "{{ .Values.oTelCollector.name }}:{{ .Values.oTelCollector.port }}"
         - name: OTEL_SERVICE_NAME
           values: "{{ .Values.frontend.name }}"
+        {{- end }}
 
         resources:
           {{- toYaml .Values.frontend.resources | nindent 10 -}}

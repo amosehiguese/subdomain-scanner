@@ -1,20 +1,20 @@
 images:
-  repository: gcr.io/amosehiguese/subdomain-scanner
+  repository: github.com/amosehiguese/subdomain-scanner
   tag: "0.0.1"
 
 networkPolicies:
   create: false
 
 oTelCollector:
-  create: false
+  create: true
   name: otelcollector
-  port: 4317
-
+  port: 14278
 
 apiQuerySvc:
   create: true
   name: apiquerysvc
   port: 50051
+  enableTracing: "0"
   resources:
     requests:
       cpu: 100m
@@ -24,9 +24,10 @@ apiQuerySvc:
       memory: 128Mi
 
 bruteSvc:
-  create: true
+  create: false
   name: brutesvc
   port: 50052
+  enableTracing: "0"
   resources:
     cpu: 200m
     memory: 180Mi
@@ -38,6 +39,7 @@ dnsResolveSvc:
   create: true
   name: dnsresolvesvc
   port: 50053
+  enableTracing: "0"
   resources:
     requests:
       cpu: 200m
@@ -64,6 +66,7 @@ portScanSvc:
   create: true
   name: portscansvc
   port: 50054
+  enableTracing: "0"
   resources:
     requests:
       cpu: 200m
