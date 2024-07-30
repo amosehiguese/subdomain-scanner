@@ -105,7 +105,9 @@ The user initiates a POST request containing the target domain. Upon receiving t
 | Fluent Bit                         | A log and metrics processor which serves as a cluster-level log collector agent.
 | Elastic Search                         | A logging backend.
 | Kibana                         | A data visualization dashboard for Elastic-search.
+| AWS CDK                        | Used for AWS EKS infrastructure provisioning.
 |
+
 
 
 
