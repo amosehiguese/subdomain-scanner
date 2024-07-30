@@ -89,6 +89,26 @@ The user initiates a POST request containing the target domain. Upon receiving t
 | [aibruteservice](/src/aibrutesvc)             | Python           | Leverages Gen AI for finding subdomains by brute force using semantic understanding from target domain                           |
 
 
+| Technologies                                           | Uses
+| ----------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------
+| Kubernetes                         | Container Orchestration System for managing containers
+| Docker                         | A tool for packaging your application and its dependecies into an image that can be run as a container
+| Helm                       | A dependency management tool for kubernetes environment.
+| Skaffold                         | Used for speeding up development processes. It builds, runs and deploys containers into a cluster.
+| Github Actions                        | Used for setting up CI/CD to improve developement time.
+| Open Telemetry                         | A standard for telemetry data.
+| Jaeger                     | Used for handling metrics that comes from Open Telemetry.
+| Prometheus                     | Responsible for storing service insights in a time series format
+| Google Gemini                         | A cutting-edge LLM to generate subdomains based on sematic understanding.
+| gRPC                         | A RPC framework for service-to-service communication used in microservices.
+| Protocol Buffer                         | A serialization format used by gRPC to exchange data over HTTP 2.0 protocol.
+| Fluent Bit                         | A log and metrics processor which serves as a cluster-level log collector agent.
+| Elastic Search                         | A logging backend.
+| Kibana                         | A data visualization dashboard for Elastic-search.
+|
+
+
+
 
 ## License
 
