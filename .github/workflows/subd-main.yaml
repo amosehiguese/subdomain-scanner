@@ -84,3 +84,10 @@ jobs:
           pushd src/apiquerysvc
           npm i -g yarn && yarn install && yarn test
 
+  build-push:
+    needs: [tests]
+    uses: ./.github/workflows/build-push.yaml
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
