@@ -28,7 +28,7 @@ spec:
               - ALL
           privileged: false
           readOnlyRootFilesystem: true
-        image: {{ .Values.images.repository }}/{{ .Values.portScanSvc.name }}:{{ .Values.images.tag | default .Chart.AppVersion}}
+        image: {{ .Values.images.repository }}/{{ .Values.portScanSvc.name }}:{{ .Values.images.tag }}
         ports:
         - containerPort: {{ .Values.portScanSvc.port }}
         env:

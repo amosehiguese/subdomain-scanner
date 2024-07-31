@@ -1,12 +1,12 @@
 images:
-  repository: github.com/amosehiguese/subdomain-scanner
-  tag: "0.0.1"
+  repository: ghcr.io/amosehiguese/subdomain-scanner
+  tag: "main"
 
 networkPolicies:
   create: false
 
 oTelCollector:
-  create: true
+  create: false
   name: otelcollector
   port: 14278
 
