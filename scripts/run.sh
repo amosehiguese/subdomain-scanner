@@ -23,7 +23,7 @@ check_and_install docker "curl -fsSL https://get.docker.com -o get-docker.sh && 
 check_and_install helm "curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash"
 check_and_install kubectl "sudo apt-get install -yqq kubectl git"
 
-CONTAINER_REGISTRY="ghcr.io"
+CONTAINER_REGISTRY="ghcr.io/amosehiguese/subdomain-scanner"
 LOCAL=true
 
 load_images() {
@@ -33,7 +33,7 @@ load_images() {
 
       # Extract service name and version from directory or any other method you prefer
       service_name=$(basename "$service")
-      version=$(git describe --match 'v[0-9]*' --tags --always)
+      version="main"
 
       # Build Docker image
       docker build -t "$service_name:$version" .
@@ -42,14 +42,9 @@ load_images() {
           exit 1
       fi
 
-      if [ "$LOCAL" = true ]; then
-          # Load Docker image into kind cluster
-          kind load docker-image "$service_name:$version"
-      else
-          # Tag and push Docker image to the registry
-          docker tag "$service_name:$version" "$CONTAINER_REGISTRY/$service_name:$version"
-          docker push "$CONTAINER_REGISTRY/$service_name:$version"
-      fi
+
+      # Load Docker image into kind cluster
+      kind load docker-image "$service_name:$version"
 
       cd - || exit
   done
@@ -222,13 +217,14 @@ if "$LOCAL"; then
   else
     echo "Kind cluster not up"
     create_kind_cluster
+
   fi
+  load_images
 else
   echo "✅ Setting up EKS"
   set_up_aws $1 $2
 fi
 
-load_images
 check_all_nodes_running
 create_metrics_resources
 create_logging_resources
