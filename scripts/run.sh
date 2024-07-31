@@ -23,35 +23,37 @@ check_and_install docker "curl -fsSL https://get.docker.com -o get-docker.sh && 
 check_and_install helm "curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash"
 check_and_install kubectl "sudo apt-get install -yqq kubectl git"
 
-SERVICES=("apiquerysvc" "dnsresolvesvc" "portscansvc" "frontend")
 CONTAINER_REGISTRY="ghcr.io"
 LOCAL=true
 
-for service in "${SERVICES[@]}"; do
-    cd src/$service || { echo "Service path $service not found. Exiting."; exit 1; }
+load_images() {
+  SERVICES=("apiquerysvc" "dnsresolvesvc" "portscansvc" "frontend")
+  for service in "${SERVICES[@]}"; do
+      cd src/$service || { echo "Service path $service not found. Exiting."; exit 1; }
 
-    # Extract service name and version from directory or any other method you prefer
-    service_name=$(basename "$service")
-    version=$(git describe --match 'v[0-9]*' --tags --always)
+      # Extract service name and version from directory or any other method you prefer
+      service_name=$(basename "$service")
+      version=$(git describe --match 'v[0-9]*' --tags --always)
 
-    # Build Docker image
-    docker build -t "$service_name:$version" .
-    if [ $? -ne 0 ]; then
-        echo "Failed to build Docker image for $service_name. Exiting."
-        exit 1
-    fi
+      # Build Docker image
+      docker build -t "$service_name:$version" .
+      if [ $? -ne 0 ]; then
+          echo "Failed to build Docker image for $service_name. Exiting."
+          exit 1
+      fi
 
-    if [ "$LOCAL" = true ]; then
-        # Load Docker image into kind cluster
-        kind load docker-image "$service_name:$version"
-    else
-        # Tag and push Docker image to the registry
-        docker tag "$service_name:$version" "$CONTAINER_REGISTRY/$service_name:$version"
-        docker push "$CONTAINER_REGISTRY/$service_name:$version"
-    fi
+      if [ "$LOCAL" = true ]; then
+          # Load Docker image into kind cluster
+          kind load docker-image "$service_name:$version"
+      else
+          # Tag and push Docker image to the registry
+          docker tag "$service_name:$version" "$CONTAINER_REGISTRY/$service_name:$version"
+          docker push "$CONTAINER_REGISTRY/$service_name:$version"
+      fi
 
-    cd - || exit
-done
+      cd - || exit
+  done
+}
 
 is_kind_cluster_running() {
   kind get clusters | grep -q 'kind'
@@ -226,6 +228,7 @@ else
   set_up_aws $1 $2
 fi
 
+load_images
 check_all_nodes_running
 create_metrics_resources
 create_logging_resources
