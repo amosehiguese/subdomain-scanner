@@ -91,3 +91,10 @@ jobs:
       contents: read
       packages: write
       id-token: write
+
+  deploy:
+    needs: [build-push]
+    uses: ./.github/workflows/deploy-ecs.yaml
+    permissions:
+      id-token: write
+      contents: read
