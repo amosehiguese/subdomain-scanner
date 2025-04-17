@@ -1,5 +1,9 @@
 name: Deploy to ECS
 on:
+  workflow_run:
+    workflows: ["Subdomain Enumeration CD"]
+    types:
+      - completed
   workflow_call:
   workflow_dispatch:
 env:
