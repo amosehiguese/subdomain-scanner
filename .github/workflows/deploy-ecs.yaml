@@ -33,11 +33,15 @@ jobs:
           role-to-assume: ${{ vars.AWS_GITHUB_ROLE }}
           aws-region: ${{ vars.AWS_REGION }}
 
+      - name: Verify AWS authentication
+        run: aws sts get-caller-identity
+
       - name: Set image tag
         id: set-tag
         run: |
           IMAGE_TAG="${{ env.REGISTRY }}/${{ env.REPO }}/${{ matrix.service }}:${{ github.sha }}"
           echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+          echo "Using image: $IMAGE_TAG"
 
       - name: Download current ECS task definition
         run: |
@@ -45,10 +49,13 @@ jobs:
             --task-definition ${{ matrix.service }} \
             --query taskDefinition \
             > task-def.json
+          cat task-def.json
 
       - name: Update task definition with new image
         run: |
           jq --arg IMAGE "$IMAGE_TAG" '.containerDefinitions[0].image = $IMAGE' task-def.json > new-task-def.json
+          echo "Updated task definition:"
+          cat new-task-def.json
 
       - name: Register new ECS task definition revision
         id: register-task-def
@@ -59,6 +66,7 @@ jobs:
           
           TASK_DEF_ARN=$(jq -r '.taskDefinition.taskDefinitionArn' task-def-out.json)
           echo "TASK_DEF_ARN=$TASK_DEF_ARN" >> $GITHUB_ENV
+          echo "Registered new task definition: $TASK_DEF_ARN"
 
       - name: Update ECS service
         run: |
@@ -66,3 +74,4 @@ jobs:
             --cluster ${{ env.CLUSTERNAME }} \
             --service ${{ matrix.service }} \
             --task-definition $TASK_DEF_ARN
+          echo "Updated ECS service ${{ matrix.service }} with new task definition"
