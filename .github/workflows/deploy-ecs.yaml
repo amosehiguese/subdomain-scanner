@@ -1,4 +1,5 @@
 name: Deploy to ECS
+
 on:
   workflow_run:
     workflows: ["Subdomain Enumeration CD"]
@@ -6,10 +7,12 @@ on:
       - completed
   workflow_call:
   workflow_dispatch:
+
 env:
   REGISTRY: ghcr.io
   REPO: ${{ github.repository }}
   CLUSTERNAME: SubdomainScanner
+
 jobs:
   deploy:
     name: Deploy Microservices to ECS
@@ -51,10 +54,29 @@ jobs:
             > task-def.json
           cat task-def.json
 
-      - name: Update task definition with new image
+      - name: Create new task definition with updated image
         run: |
-          jq --arg IMAGE "$IMAGE_TAG" '.containerDefinitions[0].image = $IMAGE' task-def.json > new-task-def.json
-          echo "Updated task definition:"
+          jq --arg IMAGE "$IMAGE_TAG" '{
+            family: .family,
+            taskRoleArn: .taskRoleArn,
+            executionRoleArn: .executionRoleArn,
+            networkMode: .networkMode,
+            containerDefinitions: (.containerDefinitions | map(.image = $IMAGE)),
+            volumes: .volumes,
+            placementConstraints: .placementConstraints,
+            requiresCompatibilities: .requiresCompatibilities,
+            cpu: .cpu,
+            memory: .memory,
+            tags: .tags,
+            pidMode: .pidMode,
+            ipcMode: .ipcMode,
+            proxyConfiguration: .proxyConfiguration,
+            inferenceAccelerators: .inferenceAccelerators,
+            ephemeralStorage: .ephemeralStorage,
+            runtimePlatform: .runtimePlatform
+          }' task-def.json > new-task-def.json
+
+          echo "New task definition JSON:"
           cat new-task-def.json
 
       - name: Register new ECS task definition revision
@@ -63,7 +85,7 @@ jobs:
           aws ecs register-task-definition \
             --cli-input-json file://new-task-def.json \
             > task-def-out.json
-          
+
           TASK_DEF_ARN=$(jq -r '.taskDefinition.taskDefinitionArn' task-def-out.json)
           echo "TASK_DEF_ARN=$TASK_DEF_ARN" >> $GITHUB_ENV
           echo "Registered new task definition: $TASK_DEF_ARN"
