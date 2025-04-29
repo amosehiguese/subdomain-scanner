@@ -33,7 +33,7 @@ spec:
         - containerPort: {{ .Values.frontend.port }}
         env:
         - name: PORT
-          value: {{ .Values.frontend.port }}
+          value: "{{ .Values.frontend.port }}"
         - name: APIQUERY_SERVICE_ADDR
           value: "{{ .Values.apiQuerySvc.name }}:{{ .Values.apiQuerySvc.port }}"
         - name: BRUTE_FORCE_SERVICE_ADDR

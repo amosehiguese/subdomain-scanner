@@ -33,7 +33,7 @@ spec:
         - containerPort: {{ .Values.portScanSvc.port }}
         env:
         - name: PORT
-          value: {{ .Values.portScanSvc.port }}
+          value: "{{ .Values.portScanSvc.port }}"
         - name: TRACING_ENABLED
           value: "{{ .Values.portScanSvc.enableTracing }}"
         resources:

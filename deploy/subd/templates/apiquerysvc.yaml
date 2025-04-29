@@ -33,7 +33,7 @@ spec:
         - containerPort: {{ .Values.apiQuerySvc.port }}
         env:
         - name: PORT
-          value: {{ .Values.apiQuerySvc.port }}
+          value: "{{ .Values.apiQuerySvc.port }}"
         - name: TRACING_ENABLED
           value: "{{ .Values.apiQuerySvc.enableTracing }}"
         resources:

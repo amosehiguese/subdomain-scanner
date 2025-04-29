@@ -33,7 +33,7 @@ spec:
         - containerPort: {{ .Values.bruteSvc.port }}
         env:
         - name: PORT
-          value: {{ .Values.bruteSvc.port }}
+          value:"{{ .Values.bruteSvc.port }}"
         - name: TRACING_ENABLED
           value: "{{ .Values.bruteSvc.enableTracing }}"
         resources:

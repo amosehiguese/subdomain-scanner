@@ -33,7 +33,7 @@ spec:
         - containerPort: {{ .Values.dnsResolveSvc.port }}
         env:
         - name: PORT
-          value: {{ .Values.dnsResolveSvc.port }}
+          value: "{{ .Values.dnsResolveSvc.port }}"
         - name: TRACING_ENABLED
           value: "{{ .Values.dnsResolveSvc.enableTracing }}"
         resources:
