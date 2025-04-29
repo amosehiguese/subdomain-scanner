@@ -41,6 +41,11 @@ jobs:
           echo "ECR_REGISTRY=${AWS_ACCOUNT_ID}.dkr.ecr.${{ vars.AWS_REGION }}.amazonaws.com" >> $GITHUB_ENV
           echo "IMAGE_TAG=${{ github.sha }}" >> $GITHUB_ENV
 
+      - name: Ensure ECR repository exists
+        run: |
+          aws ecr describe-repositories --repository-names ${{ matrix.services }} || \
+          aws ecr create-repository --repository-name ${{ matrix.services }}
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
