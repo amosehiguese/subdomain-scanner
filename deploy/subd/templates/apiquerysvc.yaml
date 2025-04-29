@@ -37,12 +37,12 @@ spec:
         - name: TRACING_ENABLED
           value: "{{ .Values.apiQuerySvc.enableTracing }}"
         resources:
-         requests:
-          cpu: 100m
-          memory: 64Mi
-        limits:
-          cpu: 200m
-          memory: 128Mi
+          requests:
+            cpu: 100m
+            memory: 64Mi
+          limits:
+            cpu: 200m
+            memory: 128Mi
         readinessProbe:
           initialDelaySeconds: 20
           periodSeconds: 15
