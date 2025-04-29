@@ -15,38 +15,19 @@ apiQuerySvc:
   name: apiquerysvc
   port: 50051
   enableTracing: "0"
-  resources:
-    requests:
-      cpu: 100m
-      memory: 64Mi
-    limits:
-      cpu: 200m
-      memory: 128Mi
+    
 
 bruteSvc:
   create: false
   name: brutesvc
   port: 50052
   enableTracing: "0"
-  resources:
-    cpu: 200m
-    memory: 180Mi
-  limits:
-    cpu: 300m
-    memory: 300Mi
 
 dnsResolveSvc:
   create: true
   name: dnsresolvesvc
   port: 50053
   enableTracing: "0"
-  resources:
-    requests:
-      cpu: 200m
-      memory: 180Mi
-    limits:
-      cpu: 300m
-      memory: 300Mi
 
 frontend:
   create: true
@@ -54,23 +35,11 @@ frontend:
   port: 8080
   enableTracing: "0"
   external: false
-  resources:
-    requests:
-      cpu: 100m
-      memory: 64Mi
-    limits:
-      cpu: 200m
-      memory: 128Mi
-
+  
 portScanSvc:
   create: true
   name: portscansvc
   port: 50054
   enableTracing: "0"
   resources:
-    requests:
-      cpu: 200m
-      memory: 180Mi
-    limits:
-      cpu: 300m
-      memory: 300Mi
+

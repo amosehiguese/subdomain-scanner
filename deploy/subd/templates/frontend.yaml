@@ -52,7 +52,12 @@ spec:
         {{- end }}
 
         resources:
-          {{- toYaml .Values.frontend.resources | nindent 10 -}}
+          requests:
+            cpu: 100m
+            memory: 64Mi
+          limits:
+            cpu: 200m
+            memory: 128Mi
         readinessProbe:
           initialDelaySeconds: 10
           httpGet:
